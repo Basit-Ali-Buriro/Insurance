@@ -4,19 +4,19 @@ const path   = require('path');
 const fs     = require('fs');
 const bcrypt = require('bcrypt');
 
-const { getDb, decryptRow, seedSampleData }  = require('./database');
+const { getDb, decryptRow, seedSampleData, closeDb }  = require('./database');
 const { encrypt, decrypt }   = require('./crypto');
 const { getLogger }          = require('./logger');
-const { checkLicense, renewLicense } = require('./licenseManager');
+const { checkLicense, renewLicense, openWhatsAppAlert } = require('./licenseManager');
 
 /* ─── Encrypted field maps per table ─── */
 const ENC = {
-  Users:            ['name', 'username'],
+  Users:            ['name', 'username', 'contact', 'contact_email', 'contact_number'],
   Area_Managers:    ['am_name', 'cnic', 'address', 'contact_1', 'contact_2'],
   SSM:              ['ssm_name', 'cnic', 'address', 'contact_1', 'contact_2'],
   SM:               ['sm_name',  'cnic', 'address', 'contact_1', 'contact_2'],
   SR:               ['sr_name',  'cnic', 'address', 'contact_1', 'contact_2'],
-  Proposer_Register:['holder_name', 'pr_no'],
+  Proposer_Register:['holder_name', 'pr_no', 'contact_1', 'contact_2'],
   Policy_Register:  ['holder_name', 'cnic', 'address', 'contact_1', 'contact_2', 'policy_no'],
 };
 
@@ -34,6 +34,12 @@ function handleAuth() {
           const ok = await bcrypt.compare(password, row.password_hash);
           if (ok) {
             log().info(`Login success — user: ${username}, role: ${row.role}`);
+            
+            const { handleLoginAlerts } = require('./licenseManager');
+            handleLoginAlerts(row.role, row).catch(err => {
+              log().error(`Error in handleLoginAlerts: ${err.message}`);
+            });
+
             return { ok: true, user: { id: row.user_id, name: decrypt(row.name), username: decName, role: row.role } };
           }
         }
@@ -51,21 +57,22 @@ function handleAuth() {
 function handleLicense() {
   ipcMain.handle('license:check', () => checkLicense());
   ipcMain.handle('license:renew', (_e, key) => renewLicense(key));
+  ipcMain.handle('license:openWhatsAppAlert', (_e, msg) => openWhatsAppAlert(msg));
 }
 
 /* ──────────────────────────── USERS ──────────────────────────── */
 function handleUsers() {
   ipcMain.handle('users:list', () => {
-    const rows = getDb().prepare('SELECT user_id, name, username, role, status, created_at FROM Users ORDER BY user_id').all();
-    return rows.map(r => decryptRow(r, ['name', 'username']));
+    const rows = getDb().prepare('SELECT user_id, name, username, role, status, contact, contact_email, contact_number, created_at FROM Users ORDER BY user_id').all();
+    return rows.map(r => decryptRow(r, ['name', 'username', 'contact', 'contact_email', 'contact_number']));
   });
 
-  ipcMain.handle('users:create', async (_e, { name, username, password, role, status }) => {
+  ipcMain.handle('users:create', async (_e, { name, username, password, role, status, contact_email, contact_number }) => {
     const db   = getDb();
     const hash = await bcrypt.hash(password, 10);
     try {
-      db.prepare('INSERT INTO Users (name, username, password_hash, role, status) VALUES (?,?,?,?,?)')
-        .run(encrypt(name), encrypt(username), hash, role, status);
+      db.prepare('INSERT INTO Users (name, username, password_hash, role, status, contact_email, contact_number) VALUES (?,?,?,?,?,?,?)')
+        .run(encrypt(name), encrypt(username), hash, role, status, encrypt(contact_email || ''), encrypt(contact_number || ''));
       log().info(`User created: ${username}`);
       return { ok: true };
     } catch (err) {
@@ -73,18 +80,20 @@ function handleUsers() {
     }
   });
 
-  ipcMain.handle('users:update', async (_e, { id, name, username, role, status, password }) => {
+  ipcMain.handle('users:update', async (_e, data) => {
     const db = getDb();
+    const { user_id, id, name, username, role, status, password, contact_email, contact_number } = data;
+    const targetId = id || user_id;
     try {
       if (password) {
         const hash = await bcrypt.hash(password, 10);
-        db.prepare('UPDATE Users SET name=?, username=?, role=?, status=?, password_hash=? WHERE user_id=?')
-          .run(encrypt(name), encrypt(username), role, status, hash, id);
+        db.prepare('UPDATE Users SET name=?, username=?, role=?, status=?, contact_email=?, contact_number=?, password_hash=? WHERE user_id=?')
+          .run(encrypt(name), encrypt(username), role, status, encrypt(contact_email || ''), encrypt(contact_number || ''), hash, targetId);
       } else {
-        db.prepare('UPDATE Users SET name=?, username=?, role=?, status=? WHERE user_id=?')
-          .run(encrypt(name), encrypt(username), role, status, id);
+        db.prepare('UPDATE Users SET name=?, username=?, role=?, status=?, contact_email=?, contact_number=? WHERE user_id=?')
+          .run(encrypt(name), encrypt(username), role, status, encrypt(contact_email || ''), encrypt(contact_number || ''), targetId);
       }
-      log().info(`User updated: id=${id}`);
+      log().info(`User updated: id=${targetId}`);
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err.message };
@@ -146,14 +155,16 @@ function handleAreaManagers() {
       no_of_srs:  db.prepare('SELECT COUNT(*) as c FROM SR  WHERE am_id=?').get(r.id)?.c ?? 0,
       total_business: db.prepare(`SELECT COALESCE(SUM(pr.premium),0) as t FROM Policy_Register pr
         JOIN SR sr ON pr.sr_id=sr.id WHERE sr.am_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(syl.premium),0) as t FROM Second_Year_Log syl
+        JOIN SR sr ON syl.sr_id=sr.id WHERE sr.am_id=?`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('am:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare('INSERT INTO Area_Managers (am_code,am_name,address,cnic,contact_1,contact_2,status) VALUES (?,?,?,?,?,?,?)')
-        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status || 'active');
+      db.prepare('INSERT INTO Area_Managers (am_code,am_name,address,cnic,contact_1,contact_2,status,license_date) VALUES (?,?,?,?,?,?,?,?)')
+        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status || 'active', data.license_date || null);
       log().info(`AM created: ${data.am_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -162,8 +173,8 @@ function handleAreaManagers() {
   ipcMain.handle('am:update', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare('UPDATE Area_Managers SET am_code=?,am_name=?,address=?,cnic=?,contact_1=?,contact_2=?,status=? WHERE id=?')
-        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status, data.id);
+      db.prepare('UPDATE Area_Managers SET am_code=?,am_name=?,address=?,cnic=?,contact_1=?,contact_2=?,status=?,license_date=? WHERE id=?')
+        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status, data.license_date || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -193,18 +204,18 @@ function handleSSM() {
       ...decryptRow(r, fields),
       no_of_sms: db.prepare('SELECT COUNT(*) as c FROM SM WHERE ssm_id=?').get(r.id)?.c ?? 0,
       no_of_srs: db.prepare('SELECT COUNT(*) as c FROM SR WHERE ssm_id=?').get(r.id)?.c ?? 0,
-      total_business: db.prepare(`SELECT COALESCE(SUM(pr.premium),0) as t FROM Policy_Register pr
-        JOIN SR sr ON pr.sr_id=sr.id WHERE sr.ssm_id=?`).get(r.id)?.t ?? 0,
+      total_business: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE ssm_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE ssm_id=?`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('ssm:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SSM (ssm_code,ssm_name,address,cnic,contact_1,contact_2,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SSM (ssm_code,ssm_name,address,cnic,contact_1,contact_2,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.ssm_code, encrypt(data.ssm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
       log().info(`SSM created: ${data.ssm_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -214,9 +225,9 @@ function handleSSM() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SSM SET ssm_code=?,ssm_name=?,address=?,cnic=?,contact_1=?,contact_2=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
         .run(data.ssm_code, encrypt(data.ssm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -247,18 +258,18 @@ function handleSM() {
     return rows.map(r => ({
       ...decryptRow(r, fields),
       no_of_srs: db.prepare('SELECT COUNT(*) as c FROM SR WHERE sm_id=?').get(r.id)?.c ?? 0,
-      total_business: db.prepare(`SELECT COALESCE(SUM(pr.premium),0) as t FROM Policy_Register pr
-        JOIN SR sr ON pr.sr_id=sr.id WHERE sr.sm_id=?`).get(r.id)?.t ?? 0,
+      total_business: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE sm_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE sm_id=?`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('sm:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SM (sm_code,sm_name,address,cnic,contact_1,contact_2,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SM (sm_code,sm_name,address,cnic,contact_1,contact_2,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.sm_code, encrypt(data.sm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.ssm_id || null, data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
       log().info(`SM created: ${data.sm_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -268,9 +279,9 @@ function handleSM() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SM SET sm_code=?,sm_name=?,address=?,cnic=?,contact_1=?,contact_2=?,ssm_id=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
         .run(data.sm_code, encrypt(data.sm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.ssm_id || null, data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -300,16 +311,17 @@ function handleSR() {
     return rows.map(r => ({
       ...decryptRow(r, fields),
       no_of_policies: db.prepare('SELECT COUNT(*) as c FROM Policy_Register WHERE sr_id=?').get(r.id)?.c ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE sr_id=?`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('sr:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SR (sr_code,sr_name,address,cnic,contact_1,contact_2,sm_id,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SR (sr_code,sr_name,address,cnic,contact_1,contact_2,sm_id,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.sr_code, encrypt(data.sr_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.sm_id || null, data.ssm_id || null, data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
       log().info(`SR created: ${data.sr_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -319,9 +331,9 @@ function handleSR() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SR SET sr_code=?,sr_name=?,address=?,cnic=?,contact_1=?,contact_2=?,sm_id=?,ssm_id=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
         .run(data.sr_code, encrypt(data.sr_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.sm_id || null, data.ssm_id || null, data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -402,9 +414,9 @@ function handleProposer() {
   ipcMain.handle('proposer:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO Proposer_Register (proposal_no,holder_name,premium,pr_no,pr_date,amount_type,requirements,sr_id,sm_id,ssm_id,status)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
-        .run(data.proposal_no, encrypt(data.holder_name), data.premium, encrypt(data.pr_no), data.pr_date, data.amount_type, data.requirements, data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.status || 'not_ok');
+      db.prepare(`INSERT INTO Proposer_Register (proposal_no,holder_name,premium,pr_no,pr_date,amount_type,requirements,sr_id,sm_id,ssm_id,status,contact_1,contact_2)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+        .run(data.proposal_no, encrypt(data.holder_name), data.premium, encrypt(data.pr_no), data.pr_date, data.amount_type, data.requirements, data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.status || 'not_ok', encrypt(data.contact_1 || ''), encrypt(data.contact_2 || ''));
       log().info(`Proposer created: ${data.proposal_no}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -413,8 +425,8 @@ function handleProposer() {
   ipcMain.handle('proposer:update', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`UPDATE Proposer_Register SET proposal_no=?,holder_name=?,premium=?,pr_no=?,pr_date=?,amount_type=?,requirements=?,sr_id=?,sm_id=?,ssm_id=?,status=? WHERE id=?`)
-        .run(data.proposal_no, encrypt(data.holder_name), data.premium, encrypt(data.pr_no), data.pr_date, data.amount_type, data.requirements, data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.status, data.id);
+      db.prepare(`UPDATE Proposer_Register SET proposal_no=?,holder_name=?,premium=?,pr_no=?,pr_date=?,amount_type=?,requirements=?,sr_id=?,sm_id=?,ssm_id=?,status=?,contact_1=?,contact_2=? WHERE id=?`)
+        .run(data.proposal_no, encrypt(data.holder_name), data.premium, encrypt(data.pr_no), data.pr_date, data.amount_type, data.requirements, data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.status, encrypt(data.contact_1 || ''), encrypt(data.contact_2 || ''), data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -435,9 +447,39 @@ function handleProposer() {
     const prop = decryptRow(db.prepare('SELECT * FROM Proposer_Register WHERE id=?').get(id), ENC.Proposer_Register);
     if (!prop) return { ok: false, error: 'Proposal not found.' };
     if (prop.converted_to_policy) return { ok: false, error: 'Already converted.' };
-    db.prepare('UPDATE Proposer_Register SET converted_to_policy=1, status=? WHERE id=?').run('ok', id);
-    log().info(`Proposal ${prop.proposal_no} converted to policy`);
-    return { ok: true, prefill: { holder_name: prop.holder_name, premium: prop.premium, sr_id: prop.sr_id, sm_id: prop.sm_id, ssm_id: prop.ssm_id, proposal_id: id } };
+    
+    try {
+      let policyId;
+      db.transaction(() => {
+        const finalPolicyNo = `TEMP-POL-${id}-${Date.now()}`;
+
+        const info = db.prepare(`INSERT INTO Policy_Register (policy_no,holder_name,cnic,address,contact_1,contact_2,premium,issue_date,sr_id,sm_id,ssm_id,proposal_id)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+          .run(
+            encrypt(finalPolicyNo),
+            encrypt(prop.holder_name),
+            encrypt('00000-0000000-0'),
+            encrypt(''),
+            encrypt(prop.contact_1 || ''),
+            encrypt(prop.contact_2 || ''),
+            prop.premium,
+            new Date().toISOString().split('T')[0],
+            prop.sr_id || null,
+            prop.sm_id || null,
+            prop.ssm_id || null,
+            id
+          );
+        policyId = info.lastInsertRowid;
+
+        db.prepare('UPDATE Proposer_Register SET converted_to_policy=1, status=? WHERE id=?').run('ok', id);
+      })();
+      
+      log().info(`Proposal ${prop.proposal_no} converted to policy ${policyId}`);
+      return { ok: true, policyId };
+    } catch (err) {
+      log().error(`Error converting proposal to policy: ${err.message}`);
+      return { ok: false, error: err.message };
+    }
   });
 }
 
@@ -516,15 +558,15 @@ function handleNotifications() {
   ipcMain.handle('notifications:list', () => {
     const db   = getDb();
     const today = new Date().toISOString().split('T')[0];
-    const rows  = db.prepare(`SELECT p.id, p.policy_no, p.holder_name, p.contact_1, p.due_date,
-        sr.sr_code, sr.sr_name, n.whatsapp_sent, n.whatsapp_sent_at,
+    const rows  = db.prepare(`SELECT p.id, p.policy_no, p.holder_name, p.contact_1, p.due_date, p.premium,
+        sr.sr_code, sr.sr_name, COALESCE(n.whatsapp_sent, 0) as whatsapp_sent, n.whatsapp_sent_at,
         julianday(p.due_date) - julianday(?) as days_left
       FROM Policy_Register p
-      JOIN Notifications n ON n.policy_id=p.id
+      LEFT JOIN Notifications n ON n.policy_id=p.id
       LEFT JOIN SR sr ON p.sr_id=sr.id
-      WHERE p.due_date BETWEEN ? AND date(?,'+30 days')
+      WHERE p.due_date <= date(?,'+30 days')
         AND (p.last_paid_date IS NULL OR p.last_paid_date < p.due_date)
-      ORDER BY days_left ASC`).all(today, today, today);
+      ORDER BY days_left ASC`).all(today, today);
     return rows.map(r => decryptRow(r, ['holder_name', 'contact_1', 'policy_no', 'sr_name']));
   });
 
@@ -532,19 +574,27 @@ function handleNotifications() {
     const db   = getDb();
     const today = new Date().toISOString().split('T')[0];
     const { c } = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register p
-      WHERE p.due_date BETWEEN ? AND date(?,'+30 days')
-        AND (p.last_paid_date IS NULL OR p.last_paid_date < p.due_date)`).get(today, today);
+      WHERE p.due_date <= date(?,'+30 days')
+        AND (p.last_paid_date IS NULL OR p.last_paid_date < p.due_date)`).get(today);
     return c;
   });
 
   ipcMain.handle('notifications:markWhatsapp', (_e, policyId) => {
     const now = new Date().toISOString();
-    getDb().prepare('UPDATE Notifications SET whatsapp_sent=1, whatsapp_sent_at=? WHERE policy_id=?').run(now, policyId);
+    const db = getDb();
+    const row = db.prepare('SELECT id FROM Notifications WHERE policy_id=?').get(policyId);
+    if (row) {
+      db.prepare('UPDATE Notifications SET whatsapp_sent=1, whatsapp_sent_at=? WHERE policy_id=?').run(now, policyId);
+    } else {
+      db.prepare('INSERT INTO Notifications (policy_id, whatsapp_sent, whatsapp_sent_at, triggered_date) VALUES (?, 1, ?, ?)')
+        .run(policyId, now, new Date().toISOString().split('T')[0]);
+    }
     return { ok: true };
   });
 
-  ipcMain.handle('notifications:openWhatsapp', (_e, { phone, name, policyNo, dueDate }) => {
-    const msg = encodeURIComponent(`Assalam o Alaikum ${name}, your insurance policy installment (Policy No: ${policyNo}) is due on ${dueDate}. Please make the payment at your earliest. Thank you.`);
+  ipcMain.handle('notifications:openWhatsapp', (_e, { phone, name, policyNo, dueDate, premium }) => {
+    const formatted = Number(premium || 0).toLocaleString();
+    const msg = encodeURIComponent(`Assalam o Alaikum ${name}, your premium of Rs. ${formatted} for policy number ${policyNo} is due on ${dueDate}. Please make payment at your earliest. Thank you.`);
     const clean = phone.replace(/\D/g, '');
     const url   = `https://wa.me/${clean.startsWith('0') ? '92' + clean.slice(1) : clean}?text=${msg}`;
     shell.openExternal(url);
@@ -574,6 +624,12 @@ function handleDashboard() {
     const currentMonthPrem = db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE strftime('%Y-%m', issue_date)=strftime('%Y-%m',?)`).get(monthStart).t;
     const prevMonthPrem    = db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE issue_date >= ? AND issue_date < ?`).get(prevMonthStart, prevMonthEnd).t;
     const ytdPrem          = db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE strftime('%Y',issue_date)=?`).get(String(y)).t;
+
+    const currPolicies = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE strftime('%Y-%m', issue_date)=strftime('%Y-%m',?)`).get(monthStart).c;
+    const prevPolicies = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE issue_date >= ? AND issue_date < ?`).get(prevMonthStart, prevMonthEnd).c;
+
+    const currProposals = db.prepare(`SELECT COUNT(*) as c FROM Proposer_Register WHERE strftime('%Y-%m', pr_date)=strftime('%Y-%m',?)`).get(monthStart).c;
+    const prevProposals = db.prepare(`SELECT COUNT(*) as c FROM Proposer_Register WHERE pr_date >= ? AND pr_date < ?`).get(prevMonthStart, prevMonthEnd).c;
 
     const todayStr  = today.toISOString().split('T')[0];
     const due7  = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+7 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
@@ -609,6 +665,7 @@ function handleDashboard() {
     return {
       totalPolicies, totalProposals, totalSRs, totalSMs, totalSSMs,
       currentMonthPrem, prevMonthPrem, ytdPrem,
+      currPolicies, prevPolicies, currProposals, prevProposals,
       due7, due15, due30,
       renewals, monthlyChart,
       topSR: srRows ? { ...srRows, sr_name: decrypt(srRows.sr_name) } : null,
@@ -648,8 +705,7 @@ function handleBusinessFigure() {
         COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl WHERE syl.sm_id=sm.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
       FROM SM sm
       LEFT JOIN SSM ssm ON sm.ssm_id=ssm.id
-      LEFT JOIN SR sr ON sr.sm_id=sm.id
-      LEFT JOIN Policy_Register p ON p.sr_id=sr.id AND p.issue_date BETWEEN ? AND ?
+      LEFT JOIN Policy_Register p ON p.sm_id=sm.id AND p.issue_date BETWEEN ? AND ?
       GROUP BY sm.id ORDER BY total_business DESC`).all(from, to, from, to, from, to);
     return rows.map(r => ({ ...r, sm_name: decrypt(r.sm_name) }));
   });
@@ -664,11 +720,25 @@ function handleBusinessFigure() {
         COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl WHERE syl.ssm_id=ssm.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
       FROM SSM ssm
       LEFT JOIN Area_Managers am ON ssm.am_id=am.id
-      LEFT JOIN SM sm ON sm.ssm_id=ssm.id
-      LEFT JOIN SR sr ON sr.sm_id=sm.id
-      LEFT JOIN Policy_Register p ON p.sr_id=sr.id AND p.issue_date BETWEEN ? AND ?
+      LEFT JOIN Policy_Register p ON p.ssm_id=ssm.id AND p.issue_date BETWEEN ? AND ?
       GROUP BY ssm.id ORDER BY total_business DESC`).all(from, to, from, to, from, to, from, to);
     return rows.map(r => ({ ...r, ssm_name: decrypt(r.ssm_name), am_name: r.am_name ? decrypt(r.am_name) : '' }));
+  });
+
+  ipcMain.handle('business:amFigure', (_e, { from, to }) => {
+    const db = getDb();
+    const rows = db.prepare(`SELECT am.id, am.am_code, am.am_name,
+        COALESCE(SUM(p.premium),0) as total_business,
+        COUNT(p.id) as no_of_policies,
+        (SELECT COUNT(*) FROM SSM ssm2 WHERE ssm2.am_id=am.id AND ssm2.created_at BETWEEN ? AND ?) as no_of_ssms_added,
+        (SELECT COUNT(*) FROM SM sm2 WHERE sm2.am_id=am.id AND sm2.created_at BETWEEN ? AND ?) as no_of_sms_added,
+        (SELECT COUNT(*) FROM SR sr2 WHERE sr2.am_id=am.id AND sr2.created_at BETWEEN ? AND ?) as no_of_srs_added,
+        COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl JOIN SR sr3 ON syl.sr_id=sr3.id WHERE sr3.am_id=am.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
+      FROM Area_Managers am
+      LEFT JOIN SR sr ON sr.am_id=am.id
+      LEFT JOIN Policy_Register p ON p.sr_id=sr.id AND p.issue_date BETWEEN ? AND ?
+      GROUP BY am.id ORDER BY total_business DESC`).all(from, to, from, to, from, to, from, to, from, to);
+    return rows.map(r => ({ ...r, am_name: decrypt(r.am_name) }));
   });
 }
 
@@ -700,6 +770,64 @@ function handleBackup() {
     await archive.finalize();
     log().info(`Backup downloaded to: ${result.filePath}`);
     return { ok: true, path: result.filePath };
+  });
+
+  ipcMain.handle('backup:restore', async () => {
+    try {
+      const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'ZIP', extensions: ['zip'] }]
+      });
+      if (result.canceled || result.filePaths.length === 0) return { ok: false, canceled: true };
+      const filePath = result.filePaths[0];
+
+      // Close the database connection first
+      closeDb();
+
+      const AdmZip = require('adm-zip');
+      const zip = new AdmZip(filePath);
+      
+      const zipEntries = zip.getEntries();
+      const hasDbAtRoot = zipEntries.some(entry => entry.entryName === 'sysconfig.dat');
+      const hasDbInAppdata = zipEntries.some(entry => entry.entryName === 'appdata/sysconfig.dat');
+      
+      if (!hasDbAtRoot && !hasDbInAppdata) {
+        // Re-initialize database to not leave app broken
+        const { initializeDatabase } = require('./database');
+        initializeDatabase();
+        return { ok: false, error: 'Invalid backup file: sysconfig.dat not found inside zip.' };
+      }
+
+      const userDataPath = app.getPath('userData');
+      zip.extractAllTo(userDataPath, true);
+
+      // Handle the case where sysconfig.dat was extracted to the root instead of appdata/
+      const rootDbPath = path.join(userDataPath, 'sysconfig.dat');
+      const appdataDbPath = path.join(userDataPath, 'appdata', 'sysconfig.dat');
+      if (fs.existsSync(rootDbPath)) {
+        const appdataDir = path.dirname(appdataDbPath);
+        if (!fs.existsSync(appdataDir)) {
+          fs.mkdirSync(appdataDir, { recursive: true });
+        }
+        // Overwrite existing database in appdata/
+        fs.copyFileSync(rootDbPath, appdataDbPath);
+        fs.unlinkSync(rootDbPath);
+      }
+
+      // Re-initialize database connection
+      const { initializeDatabase } = require('./database');
+      initializeDatabase();
+
+      log().info(`Backup restored successfully from: ${filePath}`);
+      return { ok: true };
+    } catch (err) {
+      log().error(`Failed to restore backup: ${err.message}`);
+      try {
+        const { initializeDatabase } = require('./database');
+        initializeDatabase();
+      } catch {}
+      return { ok: false, error: err.message };
+    }
   });
 }
 
@@ -746,53 +874,140 @@ function handlePdfGenerators() {
     if (result.canceled) return { ok: false, canceled: true };
     const filePath = result.filePath;
 
-    const doc = new PDFDocument({ margin: 50 });
+    const doc = new PDFDocument({ margin: 50, bufferPages: true });
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    doc.fontSize(20).text('Insurance ERP - Dashboard Executive Summary', { align: 'center' });
+    doc.fontSize(22).font('Helvetica-Bold').text('Insurance Policy Management System', { align: 'center' });
+    doc.fontSize(14).font('Helvetica-Oblique').text('Dashboard Report', { align: 'center' });
     doc.moveDown();
     doc.fontSize(10).text(`Report Date: ${new Date().toLocaleString()}`, { align: 'right' });
     doc.moveDown(1.5);
 
-    // Summary Section
-    doc.fontSize(14).font('Helvetica-Bold').text('System Statistics');
-    doc.moveDown(0.5);
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Total Active Policies: ${totalPolicies}`);
-    doc.text(`Total Customer Proposals: ${totalProposals}`);
-    doc.text(`Total SSM Recruitments: ${totalSSMs}`);
-    doc.text(`Total SM Recruitments: ${totalSMs}`);
-    doc.text(`Total SR Recruitments: ${totalSRs}`);
-    doc.moveDown();
+    // Summary & Financial Sections side-by-side
+    const tablesStartY = doc.y;
+    const leftX = 50;
+    const rightX = 310;
+    const col1Width = 160;
+    const col2Width = 80;
+    const headerHeight = 20;
+    const rowHeight = 18;
+    const cellPadding = 4;
 
-    doc.fontSize(14).font('Helvetica-Bold').text('Financial Metrics');
-    doc.moveDown(0.5);
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Current Month Premium Volume: Rs. ${Number(currentMonthPrem).toLocaleString()}`);
-    doc.text(`Previous Month Premium Volume: Rs. ${Number(prevMonthPrem).toLocaleString()}`);
-    doc.text(`Year-to-Date Premium Volume: Rs. ${Number(ytdPrem).toLocaleString()}`);
-    doc.moveDown(1.5);
+    doc.fontSize(12).font('Helvetica-Bold');
+    doc.text('System Statistics', leftX, tablesStartY, { width: 240 });
+    doc.text('Financial Metrics', rightX, tablesStartY, { width: 240 });
+
+    const tableTopY = tablesStartY + 20;
+
+    // Left Table: System Statistics
+    doc.strokeColor('#000000').lineWidth(1).fontSize(9).font('Helvetica-Bold');
+    doc.rect(leftX, tableTopY, col1Width, headerHeight).stroke();
+    doc.text('Metric Name', leftX + cellPadding, tableTopY + cellPadding, { width: col1Width - cellPadding*2, height: headerHeight - cellPadding*2 });
+    doc.rect(leftX + col1Width, tableTopY, col2Width, headerHeight).stroke();
+    doc.text('Count', leftX + col1Width + cellPadding, tableTopY + cellPadding, { width: col2Width - cellPadding*2, height: headerHeight - cellPadding*2 });
+
+    let currentLeftY = tableTopY + headerHeight;
+    doc.font('Helvetica');
+    const statsData = [
+      { label: 'Total Active Policies', val: totalPolicies },
+      { label: 'Total Customer Proposals', val: totalProposals },
+      { label: 'Total SSM Recruitments', val: totalSSMs },
+      { label: 'Total SM Recruitments', val: totalSMs },
+      { label: 'Total SR Recruitments', val: totalSRs }
+    ];
+    for (const item of statsData) {
+      doc.rect(leftX, currentLeftY, col1Width, rowHeight).stroke();
+      doc.text(item.label, leftX + cellPadding, currentLeftY + cellPadding, { width: col1Width - cellPadding*2, height: rowHeight - cellPadding*2 });
+      doc.rect(leftX + col1Width, currentLeftY, col2Width, rowHeight).stroke();
+      doc.text(String(item.val ?? 0), leftX + col1Width + cellPadding, currentLeftY + cellPadding, { width: col2Width - cellPadding*2, height: rowHeight - cellPadding*2 });
+      currentLeftY += rowHeight;
+    }
+
+    // Right Table: Financial Metrics
+    doc.font('Helvetica-Bold');
+    doc.rect(rightX, tableTopY, col1Width, headerHeight).stroke();
+    doc.text('Financial Period', rightX + cellPadding, tableTopY + cellPadding, { width: col1Width - cellPadding*2, height: headerHeight - cellPadding*2 });
+    doc.rect(rightX + col1Width, tableTopY, col2Width, headerHeight).stroke();
+    doc.text('Premium Volume', rightX + col1Width + cellPadding, tableTopY + cellPadding, { width: col2Width - cellPadding*2, height: headerHeight - cellPadding*2 });
+
+    let currentRightY = tableTopY + headerHeight;
+    doc.font('Helvetica');
+    const financialData = [
+      { label: 'Current Month Premium', val: `Rs. ${Number(currentMonthPrem).toLocaleString()}` },
+      { label: 'Previous Month Premium', val: `Rs. ${Number(prevMonthPrem).toLocaleString()}` },
+      { label: 'Year-to-Date Premium', val: `Rs. ${Number(ytdPrem).toLocaleString()}` }
+    ];
+    for (const item of financialData) {
+      doc.rect(rightX, currentRightY, col1Width, rowHeight).stroke();
+      doc.text(item.label, rightX + cellPadding, currentRightY + cellPadding, { width: col1Width - cellPadding*2, height: rowHeight - cellPadding*2 });
+      doc.rect(rightX + col1Width, currentRightY, col2Width, rowHeight).stroke();
+      doc.text(String(item.val), rightX + col1Width + cellPadding, currentRightY + cellPadding, { width: col2Width - cellPadding*2, height: rowHeight - cellPadding*2 });
+      currentRightY += rowHeight;
+    }
+
+    // Set doc.y for the next section
+    doc.y = Math.max(currentLeftY, currentRightY) + 20;
+    doc.x = 50;
 
     // Monthly Chart Table representation
     doc.fontSize(14).font('Helvetica-Bold').text('Premium Collection Trend (Trailing 12 Months)');
     doc.moveDown(0.5);
     
-    // Draw columns
-    doc.fontSize(10).font('Helvetica-Bold');
-    doc.text('Month/Year', 50, doc.y, { width: 250 });
-    doc.text('Total Premium Collection', 300, doc.y, { width: 250 });
-    doc.strokeColor('#cccccc').lineWidth(1).moveTo(50, doc.y + 12).lineTo(550, doc.y + 12).stroke();
-    doc.moveDown(1.5);
+    const startY = doc.y;
+    doc.strokeColor('#000000').lineWidth(1).fontSize(10).font('Helvetica-Bold');
     
+    // Draw Month/Year header cell
+    doc.rect(leftX, startY, 250, headerHeight).stroke();
+    doc.text('Month/Year', leftX + cellPadding, startY + cellPadding, { width: 250 - (cellPadding * 2), height: headerHeight - (cellPadding * 2) });
+    
+    // Draw Total Premium Collection header cell
+    doc.rect(leftX + 250, startY, 250, headerHeight).stroke();
+    doc.text('Total Premium Collection', leftX + 250 + cellPadding, startY + cellPadding, { width: 250 - (cellPadding * 2), height: headerHeight - (cellPadding * 2) });
+    
+    doc.y = startY + headerHeight;
     doc.font('Helvetica');
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     for (const mData of monthlyChart) {
       const monthLabel = `${MONTHS[mData.month - 1]} ${mData.year}`;
       const rowY = doc.y;
-      doc.text(monthLabel, 50, rowY, { width: 250 });
-      doc.text(`Rs. ${Number(mData.premium).toLocaleString()}`, 300, rowY, { width: 250 });
-      doc.moveDown(1.2);
+      
+      // Month/Year cell
+      doc.rect(leftX, rowY, 250, rowHeight).stroke();
+      doc.text(monthLabel, leftX + cellPadding, rowY + cellPadding, { width: 250 - (cellPadding * 2), height: rowHeight - (cellPadding * 2) });
+      
+      // Premium cell
+      doc.rect(leftX + 250, rowY, 250, rowHeight).stroke();
+      doc.text(`Rs. ${Number(mData.premium).toLocaleString()}`, leftX + 250 + cellPadding, rowY + cellPadding, { width: 250 - (cellPadding * 2), height: rowHeight - (cellPadding * 2) });
+      
+      doc.y = rowY + rowHeight;
+    }
+
+    // Draw centered footer ONLY on the last page
+    const range = doc.bufferedPageRange();
+    if (range.count > 0) {
+      const lastPageIdx = range.start + range.count - 1;
+      doc.switchToPage(lastPageIdx);
+      
+      // Save original bottom margin and disable it to prevent auto page-break
+      const oldBottomMargin = doc.page.margins.bottom;
+      doc.page.margins.bottom = 0;
+      
+      const footerY = doc.page.height - 70;
+      
+      const companyName = '© Lalwani Software Solutions.';
+      doc.fillColor('#333333').fontSize(10).font('Helvetica-Bold');
+      const textWidth = doc.widthOfString(companyName);
+      doc.text(companyName, (doc.page.width - textWidth) / 2, footerY);
+      
+      // Draw Contact Info below
+      doc.fillColor('#666666').fontSize(9).font('Helvetica');
+      const contactText = 'Contact : 03337104578 / 03243859337';
+      const contactWidth = doc.widthOfString(contactText);
+      doc.text(contactText, (doc.page.width - contactWidth) / 2, footerY + 14);
+      
+      // Restore original bottom margin
+      doc.page.margins.bottom = oldBottomMargin;
     }
 
     doc.end();
@@ -815,13 +1030,14 @@ function handlePdfGenerators() {
     if (result.canceled) return { ok: false, canceled: true };
     const filePath = result.filePath;
     
-    const doc = new PDFDocument({ margin: 50 });
+    const doc = new PDFDocument({ margin: 50, bufferPages: true });
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
     
-    doc.fontSize(20).text('Insurance ERP - Performance Report', { align: 'center' });
+    doc.fontSize(22).font('Helvetica-Bold').text('Insurance Policy Management System', { align: 'center' });
+    doc.fontSize(14).font('Helvetica-Oblique').text('Business Figure Report', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(12).text(`Role: ${role}`, { align: 'left' });
+    doc.fontSize(12).font('Helvetica').text(`Role: ${role}`, { align: 'left' });
     doc.text(`Period: ${from} to ${to}`, { align: 'left' });
     doc.text(`Generated At: ${new Date().toLocaleString()}`, { align: 'left' });
     doc.moveDown(2);
@@ -840,41 +1056,49 @@ function handlePdfGenerators() {
       headers = ['SM Code', 'SM Name', 'SSM Code', 'Business', 'Policies', 'SRs Add', '2nd Yr Prem'];
       colWidths = [60, 130, 60, 80, 50, 50, 85];
       keys = ['sm_code', 'sm_name', 'ssm_code', 'total_business', 'no_of_policies', 'no_of_srs_added', 'second_year_premium'];
-    } else {
+    } else if (role === 'SSM') {
       headers = ['SSM Code', 'SSM Name', 'AM Name', 'Business', 'Policies', 'SRs Add', 'SMs Add', '2nd Yr Prem'];
       colWidths = [60, 110, 80, 70, 40, 40, 40, 75];
       keys = ['ssm_code', 'ssm_name', 'am_name', 'total_business', 'no_of_policies', 'no_of_srs_added', 'no_of_sms_added', 'second_year_premium'];
+    } else {
+      headers = ['AM Code', 'AM Name', 'SSMs Add', 'SMs Add', 'SRs Add', 'Business', 'Policies', '2nd Yr Prem'];
+      colWidths = [60, 120, 50, 50, 50, 70, 40, 75];
+      keys = ['am_code', 'am_name', 'no_of_ssms_added', 'no_of_sms_added', 'no_of_srs_added', 'total_business', 'no_of_policies', 'second_year_premium'];
     }
+    
+    doc.strokeColor('#000000').lineWidth(1);
+    const headerHeight = 22;
+    const rowHeight = 20;
+    const cellPadding = 4;
     
     let currentX = 50;
     for (let i = 0; i < headers.length; i++) {
-      doc.text(headers[i], currentX, startY, { width: colWidths[i], align: 'left' });
+      doc.rect(currentX, startY, colWidths[i], headerHeight).stroke();
+      doc.text(headers[i], currentX + cellPadding, startY + cellPadding, { width: colWidths[i] - (cellPadding * 2), height: headerHeight - (cellPadding * 2), align: 'left' });
       currentX += colWidths[i];
     }
     
-    doc.moveDown();
-    doc.strokeColor('#cccccc').lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(0.5);
-    
+    doc.y = startY + headerHeight;
     doc.font('Helvetica');
     let grandTotalRow = null;
     
     for (const row of data) {
-      if (row.id === '__grand__' || row.sr_name === 'GRAND TOTAL' || row.sm_name === 'GRAND TOTAL' || row.ssm_name === 'GRAND TOTAL') {
+      if (row.id === '__grand__' || row.sr_name === 'GRAND TOTAL' || row.sm_name === 'GRAND TOTAL' || row.ssm_name === 'GRAND TOTAL' || row.am_name === 'GRAND TOTAL') {
         grandTotalRow = row;
         continue;
       }
       
-      if (doc.y > 700) {
+      if (doc.y + rowHeight > 700) {
         doc.addPage();
         let tempX = 50;
         doc.font('Helvetica-Bold');
+        const hY = 50;
         for (let i = 0; i < headers.length; i++) {
-          doc.text(headers[i], tempX, 50, { width: colWidths[i], align: 'left' });
+          doc.rect(tempX, hY, colWidths[i], headerHeight).stroke();
+          doc.text(headers[i], tempX + cellPadding, hY + cellPadding, { width: colWidths[i] - (cellPadding * 2), height: headerHeight - (cellPadding * 2), align: 'left' });
           tempX += colWidths[i];
         }
-        doc.strokeColor('#cccccc').lineWidth(1).moveTo(50, doc.y + 12).lineTo(550, doc.y + 12).stroke();
-        doc.moveDown(1.5);
+        doc.y = hY + headerHeight;
         doc.font('Helvetica');
       }
       
@@ -885,16 +1109,17 @@ function handlePdfGenerators() {
         if (keys[i] === 'total_business' || keys[i] === 'second_year_premium') {
           val = `Rs. ${Number(val || 0).toLocaleString()}`;
         }
-        doc.text(String(val ?? '—'), xPos, rowY, { width: colWidths[i], align: 'left' });
+        doc.rect(xPos, rowY, colWidths[i], rowHeight).stroke();
+        doc.text(String(val ?? '—'), xPos + cellPadding, rowY + cellPadding, { width: colWidths[i] - (cellPadding * 2), height: rowHeight - (cellPadding * 2), align: 'left' });
         xPos += colWidths[i];
       }
-      doc.moveDown(1.2);
+      doc.y = rowY + rowHeight;
     }
     
     if (grandTotalRow) {
-      doc.moveDown(0.5);
-      doc.strokeColor('#334155').lineWidth(1.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-      doc.moveDown(0.5);
+      if (doc.y + rowHeight > 700) {
+        doc.addPage();
+      }
       doc.font('Helvetica-Bold');
       const rowY = doc.y;
       let xPos = 50;
@@ -903,11 +1128,39 @@ function handlePdfGenerators() {
         if (keys[i] === 'total_business' || keys[i] === 'second_year_premium') {
           val = `Rs. ${Number(val || 0).toLocaleString()}`;
         }
-        doc.text(String(val ?? '—'), xPos, rowY, { width: colWidths[i], align: 'left' });
+        doc.rect(xPos, rowY, colWidths[i], rowHeight).stroke();
+        doc.text(String(val ?? '—'), xPos + cellPadding, rowY + cellPadding, { width: colWidths[i] - (cellPadding * 2), height: rowHeight - (cellPadding * 2), align: 'left' });
         xPos += colWidths[i];
       }
     }
     
+    // Draw centered footer ONLY on the last page
+    const range = doc.bufferedPageRange();
+    if (range.count > 0) {
+      const lastPageIdx = range.start + range.count - 1;
+      doc.switchToPage(lastPageIdx);
+      
+      // Save original bottom margin and disable it to prevent auto page-break
+      const oldBottomMargin = doc.page.margins.bottom;
+      doc.page.margins.bottom = 0;
+      
+      const footerY = doc.page.height - 70;
+      
+      const companyName = '© Lalwani Software Solutions.';
+      doc.fillColor('#333333').fontSize(10).font('Helvetica-Bold');
+      const textWidth = doc.widthOfString(companyName);
+      doc.text(companyName, (doc.page.width - textWidth) / 2, footerY);
+      
+      // Draw Contact Info below
+      doc.fillColor('#666666').fontSize(9).font('Helvetica');
+      const contactText = 'Contact : 03337104578 / 03243859337';
+      const contactWidth = doc.widthOfString(contactText);
+      doc.text(contactText, (doc.page.width - contactWidth) / 2, footerY + 14);
+      
+      // Restore original bottom margin
+      doc.page.margins.bottom = oldBottomMargin;
+    }
+
     doc.end();
     return new Promise((resolve) => {
       writeStream.on('finish', () => {
@@ -955,7 +1208,7 @@ function handleExcelGenerators() {
           { header: 'SRs Added', key: 'no_of_srs_added', width: 15 },
           { header: '2nd Year Premium (PKR)', key: 'second_year_premium', width: 20 }
         ];
-      } else {
+      } else if (role === 'SSM') {
         columns = [
           { header: 'SSM Code', key: 'ssm_code', width: 15 },
           { header: 'SSM Name', key: 'ssm_name', width: 25 },
@@ -966,11 +1219,25 @@ function handleExcelGenerators() {
           { header: 'SMs Added', key: 'no_of_sms_added', width: 15 },
           { header: '2nd Year Premium (PKR)', key: 'second_year_premium', width: 20 }
         ];
+      } else {
+        columns = [
+          { header: 'AM Code', key: 'am_code', width: 15 },
+          { header: 'AM Name', key: 'am_name', width: 25 },
+          { header: 'SSMs Added', key: 'no_of_ssms_added', width: 15 },
+          { header: 'SMs Added', key: 'no_of_sms_added', width: 15 },
+          { header: 'SRs Added', key: 'no_of_srs_added', width: 15 },
+          { header: 'Total Business (PKR)', key: 'total_business', width: 20 },
+          { header: 'No of Policies', key: 'no_of_policies', width: 15 },
+          { header: '2nd Year Premium (PKR)', key: 'second_year_premium', width: 20 }
+        ];
       }
       worksheet.columns = columns;
 
       for (const r of data) {
-        worksheet.addRow(r);
+        const row = worksheet.addRow(r);
+        if (r.id === '__grand__' || r.sr_name === 'GRAND TOTAL' || r.sm_name === 'GRAND TOTAL' || r.ssm_name === 'GRAND TOTAL' || r.am_name === 'GRAND TOTAL') {
+          row.font = { bold: true };
+        }
       }
 
       // Formatting header row

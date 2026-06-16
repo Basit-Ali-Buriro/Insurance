@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nexus ERP - Secure Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#929090",
+                    "outline-variant": "#414755",
+                    "on-secondary-fixed-variant": "#6c228c",
+                    "secondary": "#ecb2ff",
+                    "inverse-on-surface": "#303036",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#e59dff",
+                    "on-primary-fixed-variant": "#004493",
+                    "tertiary": "#c8c6c5",
+                    "surface-bright": "#39383f",
+                    "primary-fixed-dim": "#adc6ff",
+                    "crimson-red": "#EF4444",
+                    "on-tertiary": "#313030",
+                    "background": "#131319",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#0d0e13",
+                    "electric-blue": "#007AFF",
+                    "on-secondary": "#520071",
+                    "on-background": "#e4e1ea",
+                    "surface-container-low": "#1b1b21",
+                    "surface-dim": "#131319",
+                    "secondary-fixed-dim": "#ecb2ff",
+                    "emerald-green": "#10B981",
+                    "error": "#ffb4ab",
+                    "inverse-primary": "#005bc1",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "primary": "#adc6ff",
+                    "on-primary-container": "#00285c",
+                    "surface-variant": "#34343b",
+                    "secondary-fixed": "#f8d8ff",
+                    "surface": "#131319",
+                    "outline": "#8b90a0",
+                    "tertiary-fixed": "#e5e2e1",
+                    "secondary-container": "#6f258e",
+                    "on-primary-fixed": "#001a41",
+                    "on-tertiary-container": "#2a2a29",
+                    "slate-gray": "#1E1E24",
+                    "on-primary": "#002e69",
+                    "primary-container": "#4b8eff",
+                    "surface-container-highest": "#34343b",
+                    "inverse-surface": "#e4e1ea",
+                    "on-surface-variant": "#c1c6d7",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "on-surface": "#e4e1ea",
+                    "vivid-orange": "#F59E0B",
+                    "on-tertiary-fixed-variant": "#474646",
+                    "surface-tint": "#adc6ff",
+                    "on-secondary-fixed": "#320047",
+                    "surface-container-high": "#2a2930",
+                    "deep-charcoal": "#0F0F12",
+                    "surface-container": "#1f1f25",
+                    "royal-purple": "#8E44AD"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sidebar-width": "260px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "gutter": "16px",
+                    "table-row-height": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "unit": "4px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "headline-sm": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Outfit"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "label-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0F0F12;
+            overflow: hidden;
+        }
+        .mesh-gradient {
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.12) 0, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(142, 68, 173, 0.08) 0, transparent 40%),
+                radial-gradient(at 50% 50%, rgba(19, 19, 25, 1) 0, transparent 100%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(30, 30, 36, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .input-focus-glow:focus-within {
+            box-shadow: 0 0 12px rgba(0, 122, 255, 0.2);
+            border-color: rgba(0, 122, 255, 0.5);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
+        }
+        .premium-btn {
+            background: linear-gradient(135deg, #007AFF 0%, #0056b3 100%);
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+        }
+        .premium-btn:hover {
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface flex items-center justify-center min-h-screen mesh-gradient relative font-['Outfit']">
+<!-- Subtle Technical Background Elements -->
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+<div class="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] rounded-full bg-electric-blue/10 blur-[100px]"></div>
+<div class="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] rounded-full bg-royal-purple/10 blur-[100px]"></div>
+<div class="absolute inset-0" style="background-image: radial-gradient(#ffffff08 1px, transparent 1px); background-size: 40px 40px;"></div>
+</div>
+<!-- Login Container -->
+<main class="w-full max-w-[460px] px-md relative z-10 fade-in-up">
+<!-- Brand Header -->
+<div class="text-center mb-xl animate-float">
+<h1 class="font-headline-lg text-[42px] leading-tight text-on-surface tracking-tighter mb-sm glow-text">
+            Nexus <span class="bg-clip-text text-transparent bg-gradient-to-r from-electric-blue to-royal-purple font-black">ERP</span>
+</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-[0.25em] opacity-70">
+            System Terminal Access
+        </p>
+</div>
+<!-- Login Card -->
+<div class="glass-panel rounded-xl overflow-hidden p-xl">
+<!-- Subtle accent line at top -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-electric-blue/50 to-transparent"></div>
+<form class="space-y-lg" id="loginForm">
+<!-- Username Field -->
+<div class="space-y-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant/80 ml-xs uppercase tracking-wider" for="username">Operator Identity</label>
+<div class="relative group input-focus-glow transition-all duration-300 rounded-lg border border-white/10 bg-black/40">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-electric-blue transition-colors text-[20px]">
+                        account_circle
+                    </span>
+<input class="w-full bg-transparent border-none py-[14px] pl-[48px] pr-md text-on-surface placeholder:text-on-tertiary-fixed-variant focus:ring-0 font-body-md" id="username" name="username" placeholder="Enter identification" type="text"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-sm">
+<div class="flex justify-between items-end px-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant/80 uppercase tracking-wider" for="password">Security Key</label>
+<a class="font-label-sm text-label-sm text-electric-blue/80 hover:text-electric-blue transition-colors" href="#">Recovery Required?</a>
+</div>
+<div class="relative group input-focus-glow transition-all duration-300 rounded-lg border border-white/10 bg-black/40">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-electric-blue transition-colors text-[20px]">
+                        encrypted
+                    </span>
+<input class="w-full bg-transparent border-none py-[14px] pl-[48px] pr-md text-on-surface placeholder:text-on-tertiary-fixed-variant focus:ring-0 font-body-md" id="password" name="password" placeholder="Enter secure key" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Remember Me & Status -->
+<div class="flex items-center space-x-sm px-xs">
+<div class="relative flex items-center">
+<input class="w-4 h-4 rounded-sm bg-black/40 border-white/10 text-electric-blue focus:ring-electric-blue/30 focus:ring-offset-0 cursor-pointer" id="remember" type="checkbox"/>
+</div>
+<label class="font-body-sm text-body-sm text-on-surface-variant/70 cursor-pointer select-none" for="remember">Maintain terminal session</label>
+</div>
+<!-- Primary Action -->
+<button class="w-full premium-btn text-white font-headline-sm text-headline-sm py-[14px] rounded-lg transition-all active:scale-[0.98] flex items-center justify-center space-x-sm group" type="submit">
+<span>Authorize Access</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<!-- Secondary Support Action -->
+<div class="pt-lg border-t border-white/5 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant/60">
+                    New operator? <a class="text-electric-blue hover:text-primary-container font-semibold ml-xs transition-colors" href="#">Request Provisioning</a>
+</p>
+</div>
+</form>
+</div>
+<!-- Footer Legal/System Note -->
+<footer class="mt-xl text-center space-y-md">
+<div class="inline-flex items-center space-x-sm bg-white/5 backdrop-blur-md px-lg py-sm rounded-full border border-white/5">
+<span class="w-2 h-2 rounded-full bg-emerald-green animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/80 uppercase tracking-widest">Hardware-bound Enterprise License: Active</span>
+</div>
+<div class="flex justify-center items-center space-x-md opacity-30">
+<span class="font-label-sm text-[10px] uppercase tracking-[0.2em]">AES-256 Protocol</span>
+<span class="w-1 h-1 rounded-full bg-white/50"></span>
+<span class="font-label-sm text-[10px] uppercase tracking-[0.2em]">Node v4.8.2 Stable</span>
+</div>
+</footer>
+</main>
+<!-- UI Background Texture Detail (Top Left) -->
+<div class="fixed top-xl left-xl pointer-events-none opacity-20">
+<div class="grid grid-cols-2 gap-1.5">
+<div class="w-1.5 h-1.5 bg-white/80"></div>
+<div class="w-1.5 h-1.5 bg-white/40"></div>
+<div class="w-1.5 h-1.5 bg-white/40"></div>
+<div class="w-1.5 h-1.5 border border-white/60"></div>
+</div>
+<p class="font-label-sm text-[10px] mt-md tracking-[0.3em] uppercase text-on-surface-variant">Nexus Matrix v4</p>
+</div>
+<!-- UI Background Texture Detail (Bottom Right) -->
+<div class="fixed bottom-xl right-xl pointer-events-none opacity-20 text-right">
+<p class="font-label-sm text-[10px] mb-md tracking-[0.3em] uppercase text-on-surface-variant">Secure Data Node</p>
+<div class="flex justify-end space-x-1.5">
+<div class="w-6 h-[1.5px] bg-white/20"></div>
+<div class="w-16 h-[1.5px] bg-electric-blue"></div>
+</div>
+</div>
+<script>
+    // Simple Interaction logic for password visibility
+    const toggleBtn = document.querySelector('form button[type="button"]');
+    const passwordInput = document.getElementById('password');
+    
+    toggleBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        toggleBtn.innerHTML = `<span class="material-symbols-outlined text-[20px] transition-all">${isPassword ? 'visibility' : 'visibility_off'}</span>`;
+    });
+
+    // Login feedback effect
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const btn = loginForm.querySelector('button[type="submit"]');
+        const originalContent = btn.innerHTML;
+        
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">sync</span><span>Authenticating Session...</span>`;
+        btn.classList.add('opacity-80', 'pointer-events-none');
+        
+        setTimeout(() => {
+            btn.innerHTML = `<span class="material-symbols-outlined text-[20px]">verified_user</span><span>Access Granted</span>`;
+            btn.style.background = 'linear-gradient(135deg, #10B981 0%, #059669 100%)';
+            btn.style.boxShadow = '0 4px 20px rgba(16,185,129,0.4)';
+        }, 1500);
+    });
+</script>
+</body></html>

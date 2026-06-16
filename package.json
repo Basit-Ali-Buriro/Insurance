@@ -1,6 +1,6 @@
 {
   "name": "insurance-records-management-system",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Insurance Policy Records Management System - Standalone Desktop ERP",
   "main": "main/main.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "package": "npm run build && electron-builder"
   },
   "dependencies": {
+    "adm-zip": "^0.5.17",
     "archiver": "^7.0.1",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.8.0",
@@ -36,10 +37,11 @@
     "wait-on": "^8.0.2"
   },
   "build": {
+    "npmRebuild": false,
     "appId": "com.insurance.pms",
     "productName": "Insurance Records Management System",
-    "copyright": "Copyright © 2026 Developer",
-    "icon": "assets/icon.png",
+    "copyright": "© 2026 Lalwani Software Solutions.",
+    "icon": "assets/icon.ico",
     "directories": {
       "output": "release"
     },
@@ -50,7 +52,7 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.png",
+      "icon": "assets/icon.ico",
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {

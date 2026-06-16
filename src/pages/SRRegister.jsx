@@ -20,7 +20,8 @@ const EMPTY = {
   nominee_cnic_pic: '',
   matric_cert: '',
   intermediate_cert: '',
-  degree_cert: ''
+  degree_cert: '',
+  license_date: ''
 };
 
 function FileAttachmentInput({ label, value, fieldName, code, onChange }) {
@@ -145,6 +146,20 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
   const handleSave = async () => {
     const e = validate(modal.data);
     if (Object.keys(e).length) { setErrors(e); return; }
+
+    if (modal.mode === 'edit') {
+      const original = rows.find(r => r.id === modal.data.id);
+      if (original) {
+        const smChanged  = original.sm_id !== modal.data.sm_id;
+        const ssmChanged = original.ssm_id !== modal.data.ssm_id;
+        const amChanged  = original.am_id !== modal.data.am_id;
+        if (smChanged || ssmChanged || amChanged) {
+          const ok = window.confirm("You are changing the hierarchy of this SR. Their previous business will remain with the old hierarchy, and only new business will follow the new hierarchy. Do you want to proceed?");
+          if (!ok) return;
+        }
+      }
+    }
+
     setSaving(true);
     try {
       const res = modal.mode === 'create' ? await api.createSR(modal.data) : await api.updateSR(modal.data);
@@ -172,12 +187,16 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
   };
 
   const columns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'sr_code', label: 'SR Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'sr_name', label: 'SR Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { key: 'sm_code', label: 'SM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { key: 'ssm_code', label: 'SSM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
+    { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { 
       key: 'status', 
       label: 'Status', 
@@ -188,6 +207,11 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
           {v}
         </span>
       ) 
+    },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
     },
     { key: 'no_of_policies', label: 'Policies', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'second_year_premium', label: '2nd Yr Prem', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
@@ -232,6 +256,7 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
         columns={columns} 
         rows={filtered} 
         loading={loading}
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         actions={row => (
           <div className="flex items-center gap-2">
             <button
@@ -286,6 +311,7 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
             <div className="form-group">
               <label className="form-label required">SR Code</label>
               <input 
+                autoFocus
                 className={`bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full ${errors.sr_code ? 'border-error' : ''}`}
                 value={modal.data.sr_code || ''} 
                 onChange={e => set('sr_code', e.target.value)} 
@@ -345,7 +371,7 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="form-group">
               <label className="form-label">SM</label>
               <div className="relative">
@@ -365,6 +391,16 @@ export default function SRRegister({ searchFilter, clearSearchFilter }) {
               <div className="relative">
                 <SearchableDropdown id="sr-am" options={amOpts} value={modal.data.am_id} onChange={v => set('am_id', v)} placeholder="Select AM…"/>
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">License Date</label>
+              <input 
+                type="date"
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.license_date || ''} 
+                onChange={e => set('license_date', e.target.value)} 
+              />
             </div>
           </div>
 

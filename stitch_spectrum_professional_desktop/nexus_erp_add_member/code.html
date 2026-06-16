@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Member | Nexus ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#005bc1",
+                        "surface-container-lowest": "#0d0e13",
+                        "outline": "#8b90a0",
+                        "electric-blue": "#007AFF",
+                        "on-secondary-fixed-variant": "#6c228c",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "surface-variant": "#34343b",
+                        "surface-container-highest": "#34343b",
+                        "royal-purple": "#8E44AD",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "error-container": "#93000a",
+                        "outline-variant": "#414755",
+                        "surface-container-low": "#1b1b21",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#929090",
+                        "surface-tint": "#adc6ff",
+                        "on-secondary": "#520071",
+                        "on-surface-variant": "#c1c6d7",
+                        "inverse-on-surface": "#303036",
+                        "secondary-fixed-dim": "#ecb2ff",
+                        "on-tertiary-container": "#2a2a29",
+                        "on-primary-fixed": "#001a41",
+                        "deep-charcoal": "#0F0F12",
+                        "secondary-fixed": "#f8d8ff",
+                        "on-secondary-container": "#e59dff",
+                        "error": "#ffb4ab",
+                        "slate-gray": "#1E1E24",
+                        "on-background": "#e4e1ea",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-bright": "#39383f",
+                        "secondary-container": "#6f258e",
+                        "primary": "#adc6ff",
+                        "surface-container-high": "#2a2930",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "vivid-orange": "#F59E0B",
+                        "tertiary": "#c8c6c5",
+                        "on-secondary-fixed": "#320047",
+                        "surface-container": "#1f1f25",
+                        "on-primary": "#002e69",
+                        "on-error": "#690005",
+                        "emerald-green": "#10B981",
+                        "primary-container": "#4b8eff",
+                        "inverse-surface": "#e4e1ea",
+                        "crimson-red": "#EF4444",
+                        "on-primary-container": "#00285c",
+                        "background": "#131319",
+                        "on-surface": "#e4e1ea",
+                        "secondary": "#ecb2ff",
+                        "surface": "#131319",
+                        "on-primary-fixed-variant": "#004493",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-tertiary": "#313030",
+                        "surface-dim": "#131319"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "md": "16px",
+                        "sidebar-width": "260px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "table-row-height": "40px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "mono-data": ["Inter"],
+                        "headline-md": ["Outfit"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 1px #007AFF;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F0F12; }
+        ::-webkit-scrollbar-thumb { background: #414755; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #007AFF; }
+    </style>
+</head>
+<body class="bg-deep-charcoal text-on-surface font-body-md overflow-x-hidden">
+<!-- TopAppBar from JSON -->
+<header class="flex justify-between items-center w-full px-lg h-14 sticky top-0 z-50 bg-deep-charcoal dark:bg-deep-charcoal border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Nexus ERP</span>
+<div class="hidden md:flex ml-xl gap-lg">
+<a class="text-on-surface-variant font-medium hover:bg-slate-gray hover:text-on-surface transition-colors px-md py-xs rounded" href="#">Dashboard</a>
+<a class="text-electric-blue font-bold border-b-2 border-electric-blue px-md py-xs" href="#">Show Team</a>
+<a class="text-on-surface-variant font-medium hover:bg-slate-gray hover:text-on-surface transition-colors px-md py-xs rounded" href="#">Business Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue transition-colors">edit_square</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue transition-colors">dark_mode</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue transition-colors relative">
+                notifications
+                <span class="absolute top-0 right-0 w-2 h-2 bg-crimson-red rounded-full"></span>
+</button>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuG_MFsko8rZSW5WxYzc20PRoFjtIeJ6kzQqZp7hs5rMLS7-RRaNOZlxUvkGTEf-dg7yyP1cBAtH5yVmOfTA2T9Js6hdeYdbNablYuh1KoPqXE9Ku7A2Y8y_WdIZP6NtGaGGv2kahcs9X5kKGCULJ2HPYm2IphPVsDT2lCU59ogeFI4bb3EMfLMiAbhU3fzEFcE7xZo3n_BOY1FFAv7R-Aa84FjD3WcoS3bfNmPzODBXKzEXDQi724tfV3TSqYF2L1ygwl3ixsg0"/>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar from JSON -->
+<aside class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-40 bg-slate-gray dark:bg-slate-gray border-r border-outline-variant hidden lg:flex pt-14">
+<div class="p-lg flex items-center gap-md border-b border-outline-variant mb-md">
+<div class="w-10 h-10 rounded-lg bg-deep-charcoal flex items-center justify-center">
+<span class="material-symbols-outlined text-electric-blue">admin_panel_settings</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">System Admin</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Enterprise Active</p>
+</div>
+</div>
+<nav class="flex-grow">
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">person_book</span>
+<span class="font-label-lg text-label-lg">Proposer Register</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">policy</span>
+<span class="font-label-lg text-label-lg">Policy Register</span>
+</a>
+<a class="flex items-center text-on-surface bg-deep-charcoal border-l-4 border-electric-blue py-md px-lg translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined mr-md text-electric-blue">group</span>
+<span class="font-label-lg text-label-lg">Show Team</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">map</span>
+<span class="font-label-lg text-label-lg">Area Manager</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">analytics</span>
+<span class="font-label-lg text-label-lg">Business Reports</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-lg border-t border-outline-variant">
+<button class="w-full bg-electric-blue text-white py-sm rounded-lg font-label-md text-label-md mb-lg active:scale-95 transition-transform">Renew License</button>
+<div class="space-y-sm">
+<a class="flex items-center text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined mr-md">help</span> Support
+                    </a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined mr-md text-crimson-red">logout</span> Logout
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow lg:ml-[260px] p-xl min-h-screen">
+<div class="max-w-5xl mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-xl border-b border-outline-variant pb-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Add New Team Member</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Register a new SR, SM, or SSM into the enterprise hierarchy.</p>
+</div>
+<div class="flex gap-md">
+<button class="px-lg py-sm border border-outline-variant text-on-surface rounded-lg hover:bg-surface-container-high transition-colors font-label-lg">Cancel</button>
+<button class="px-xl py-sm bg-electric-blue text-white rounded-lg hover:brightness-110 active:scale-95 transition-all font-label-lg flex items-center gap-xs" id="saveBtn">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Member
+                        </button>
+</div>
+</div>
+<form class="space-y-lg" id="memberForm">
+<!-- Form Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Left Column: Basic Info -->
+<div class="md:col-span-8 space-y-lg">
+<section class="bg-slate-gray p-lg rounded-xl border border-outline-variant">
+<h3 class="font-label-lg text-label-lg text-electric-blue uppercase tracking-wider mb-lg">Personal Identity</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Member Code *</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus" placeholder="e.g., NX-2024-001" required="" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Full Name *</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus" placeholder="As per CNIC" required="" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">CNIC Number *</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface font-mono-data form-input-focus" placeholder="XXXXX-XXXXXXX-X" required="" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Primary Contact *</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface font-mono-data form-input-focus" placeholder="+92 XXX XXXXXXX" required="" type="tel"/>
+</div>
+<div class="md:col-span-2 space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Residential Address *</label>
+<textarea class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus resize-none" placeholder="Current residential address" required="" rows="3"></textarea>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Secondary Contact (Optional)</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface font-mono-data form-input-focus" placeholder="Emergency contact" type="tel"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Date of Joining</label>
+<input class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus" type="date"/>
+</div>
+</div>
+</section>
+<section class="bg-slate-gray p-lg rounded-xl border border-outline-variant">
+<h3 class="font-label-lg text-label-lg text-electric-blue uppercase tracking-wider mb-lg">Hierarchy Assignment</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Area Manager (AM)</label>
+<select class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus">
+<option>Select Area Manager</option>
+<option>Arshad Khan - AM-091</option>
+<option>Sajid Mehmood - AM-102</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Senior Sales Manager (SSM)</label>
+<select class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus">
+<option>Select SSM</option>
+<option>Maria Noor - SSM-441</option>
+<option>Kamran Ahmed - SSM-219</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Sales Manager (SM)</label>
+<select class="w-full bg-deep-charcoal border border-outline-variant rounded-lg p-md text-on-surface form-input-focus">
+<option>Select SM</option>
+<option>Zubair Ali - SM-882</option>
+<option>Fatima Sheikh - SM-301</option>
+</select>
+</div>
+</div>
+<div class="mt-md p-md bg-deep-charcoal/50 rounded-lg flex items-center gap-md border border-electric-blue/20">
+<span class="material-symbols-outlined text-electric-blue">info</span>
+<p class="text-body-sm text-on-surface-variant italic">Note: Member will be placed under the lowest selected tier in the chain.</p>
+</div>
+</section>
+</div>
+<!-- Right Column: Document Uploads & Metadata -->
+<div class="md:col-span-4 space-y-lg">
+<section class="bg-slate-gray p-lg rounded-xl border border-outline-variant">
+<h3 class="font-label-lg text-label-lg text-electric-blue uppercase tracking-wider mb-lg">Documentation</h3>
+<!-- File Upload 1 -->
+<div class="space-y-sm mb-lg">
+<label class="font-label-sm text-label-sm text-on-surface-variant">CNIC Photo (Front/Back)</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl text-center hover:border-electric-blue transition-colors cursor-pointer group relative overflow-hidden">
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+<span class="material-symbols-outlined text-display-lg text-outline mb-xs group-hover:text-electric-blue">add_a_photo</span>
+<p class="font-label-md text-label-md text-on-surface-variant">Click to upload or drag image</p>
+<p class="text-[10px] text-outline mt-1 uppercase">JPG, PNG up to 5MB</p>
+</div>
+</div>
+<!-- File Upload 2 -->
+<div class="space-y-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Educational Certificates</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl text-center hover:border-electric-blue transition-colors cursor-pointer group relative overflow-hidden">
+<input class="absolute inset-0 opacity-0 cursor-pointer" multiple="" type="file"/>
+<span class="material-symbols-outlined text-display-lg text-outline mb-xs group-hover:text-electric-blue">upload_file</span>
+<p class="font-label-md text-label-md text-on-surface-variant">Upload Degrees/Certificates</p>
+<p class="text-[10px] text-outline mt-1 uppercase">PDF, ZIP up to 10MB</p>
+</div>
+</div>
+</section>
+<!-- Profile Photo Placeholder -->
+<section class="bg-slate-gray p-lg rounded-xl border border-outline-variant text-center">
+<div class="w-32 h-32 bg-deep-charcoal rounded-full mx-auto mb-md border-4 border-outline-variant flex items-center justify-center relative group">
+<span class="material-symbols-outlined text-[48px] text-outline">person</span>
+<button class="absolute bottom-0 right-0 bg-electric-blue text-white p-sm rounded-full active:scale-90 transition-all">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<h4 class="font-label-lg text-label-lg text-on-surface">Member Avatar</h4>
+<p class="text-body-sm text-on-surface-variant">Recommended 400x400px</p>
+</section>
+<div class="p-lg bg-emerald-green/10 border border-emerald-green/30 rounded-xl">
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-emerald-green">verified_user</span>
+<div>
+<p class="font-label-md text-label-md text-emerald-green">Compliance Check</p>
+<p class="text-body-sm text-on-surface-variant mt-xs">System will automatically verify CNIC format and uniqueness upon saving.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</form>
+<!-- Status Feedback (Hidden by default) -->
+<div class="fixed bottom-xl right-xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-md bg-slate-gray border-l-4 border-emerald-green p-lg rounded-lg shadow-2xl z-[100]" id="statusToast">
+<span class="material-symbols-outlined text-emerald-green">check_circle</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Member Created Successfully</p>
+<p class="text-body-sm text-on-surface-variant">Record has been added to the master register.</p>
+</div>
+<button class="ml-xl text-on-surface-variant hover:text-on-surface" onclick="hideToast()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+<!-- Script for interaction -->
+<script>
+        const saveBtn = document.getElementById('saveBtn');
+        const statusToast = document.getElementById('statusToast');
+        const form = document.getElementById('memberForm');
+
+        saveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Basic UI loading simulation
+            saveBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+            `;
+            saveBtn.disabled = true;
+
+            setTimeout(() => {
+                saveBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[18px]">save</span>
+                    Save Member
+                `;
+                saveBtn.disabled = false;
+                showToast();
+            }, 1500);
+        });
+
+        function showToast() {
+            statusToast.classList.remove('translate-y-20', 'opacity-0');
+            statusToast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            statusToast.classList.add('translate-y-20', 'opacity-0');
+            statusToast.classList.remove('translate-y-0', 'opacity-100');
+        }
+
+        // Drop shadow on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-xl');
+                header.classList.add('bg-slate-gray/90');
+                header.classList.add('backdrop-blur-md');
+            } else {
+                header.classList.remove('shadow-xl');
+                header.classList.remove('bg-slate-gray/90');
+                header.classList.remove('backdrop-blur-md');
+            }
+        });
+    </script>
+</body></html>

@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // License
   licenseCheck:  ()        => ipcRenderer.invoke('license:check'),
   licenseRenew:  (key)     => ipcRenderer.invoke('license:renew', key),
+  openWhatsAppAlert: (msg) => ipcRenderer.invoke('license:openWhatsAppAlert', msg),
 
   // Users
   listUsers:     ()        => ipcRenderer.invoke('users:list'),
@@ -78,6 +79,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   srFigure:  (d)              => ipcRenderer.invoke('business:srFigure', d),
   smFigure:  (d)              => ipcRenderer.invoke('business:smFigure', d),
   ssmFigure: (d)              => ipcRenderer.invoke('business:ssmFigure', d),
+  amFigure:  (d)              => ipcRenderer.invoke('business:amFigure', d),
   exportBusinessPDF: (d)      => ipcRenderer.invoke('business:exportPDF', d),
   exportBusinessExcel: (d)    => ipcRenderer.invoke('business:exportExcel', d),
 
@@ -87,6 +89,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Backup
   downloadBackup: ()          => ipcRenderer.invoke('backup:download'),
+  restoreBackup:  ()          => ipcRenderer.invoke('backup:restore'),
 
   // Database Reset / Seed
   resetDatabase:  ()          => ipcRenderer.invoke('database:reset'),

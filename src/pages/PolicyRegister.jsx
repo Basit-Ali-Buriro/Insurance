@@ -38,6 +38,24 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const highlightId = urlParams.get('highlight');
+    if (highlightId && rows.length > 0) {
+      const matched = rows.find(r => r.id === Number(highlightId));
+      if (matched && matched.policy_no && matched.policy_no.startsWith('TEMP-POL-')) {
+        let editData = { ...matched };
+        editData.policy_no = '';
+        setModal({ open: true, mode: 'edit', data: editData });
+        
+        // Remove query param from browser URL without reloading
+        const url = new URL(window.location.href);
+        url.searchParams.delete('highlight');
+        window.history.replaceState(null, '', url.pathname + url.search);
+      }
+    }
+  }, [rows]);
+
   const handleExportExcel = async () => {
     toast('Generating Excel export of policy records...', 'info');
     const res = await api.exportPolicyExcel(filtered);
@@ -75,6 +93,43 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
 
   const set = (k, v) => { setModal(m=>({...m, data:{...m.data,[k]:v}})); setErrors(e=>({...e,[k]:undefined})); };
 
+  const handleSRChange = (srId) => {
+    setModal(m => {
+      const updatedData = { ...m.data, sr_id: srId };
+      if (srId) {
+        const selectedSR = srs.find(s => s.id === srId);
+        if (selectedSR) {
+          updatedData.sm_id = selectedSR.sm_id || null;
+          updatedData.ssm_id = selectedSR.ssm_id || null;
+        }
+      }
+      return { ...m, data: updatedData };
+    });
+    setErrors(e => ({ ...e, sr_id: undefined, sm_id: undefined, ssm_id: undefined }));
+  };
+
+  const handleSMChange = (smId) => {
+    if (modal.data.sr_id) {
+      const selectedSR = srs.find(s => s.id === modal.data.sr_id);
+      if (selectedSR && selectedSR.sm_id !== smId) {
+        const ok = window.confirm("Are you sure you want to change the SM? This deviates from the selected SR's default hierarchy.");
+        if (!ok) return;
+      }
+    }
+    set('sm_id', smId);
+  };
+
+  const handleSSMChange = (ssmId) => {
+    if (modal.data.sr_id) {
+      const selectedSR = srs.find(s => s.id === modal.data.sr_id);
+      if (selectedSR && selectedSR.ssm_id !== ssmId) {
+        const ok = window.confirm("Are you sure you want to change the SSM? This deviates from the selected SR's default hierarchy.");
+        if (!ok) return;
+      }
+    }
+    set('ssm_id', ssmId);
+  };
+
   const handleSave = async () => {
     const e = validate(modal.data);
     if (Object.keys(e).length) { setErrors(e); return; }
@@ -94,16 +149,21 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
   };
 
   const columns = [
-    { key:'policy_no',    label:'Policy No' },
+    { key:'id',           label:'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
+    { key:'policy_no',    label:'Policy No', render: v => v && v.startsWith('TEMP-POL-') ? '' : v },
     { key:'holder_name',  label:'Holder Name' },
     { key:'cnic',         label:'CNIC' },
-    { key:'contact_1',    label:'Contact' },
+    { key:'address',      label:'Address' },
+    { key:'contact_1',    label:'Contact 1' },
+    { key:'contact_2',    label:'Contact 2' },
     { key:'premium',      label:'Premium', render: v=>`Rs. ${Number(v||0).toLocaleString()}` },
     { key:'issue_date',   label:'Issue Date' },
     { key:'due_date',     label:'Due Date' },
+    { key:'table_term',    label:'Table Term' },
     { key:'last_paid_date',label:'Last Paid' },
     { key:'sr_code',      label:'SR Code' },
     { key:'sm_code',      label:'SM Code' },
+    { key:'ssm_code',     label:'SSM Code' },
   ];
 
   return (
@@ -141,10 +201,17 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
       </div>
 
       <DataTable columns={columns} rows={filtered} loading={loading}
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         actions={row=><>
           <button
             className="p-1.5 hover:text-primary transition-colors material-symbols-outlined text-[18px]"
-            onClick={() => setModal({ open: true, mode: 'edit', data: { ...row } })}
+            onClick={() => {
+              let editData = { ...row };
+              if (editData.policy_no && editData.policy_no.startsWith('TEMP-POL-')) {
+                editData.policy_no = '';
+              }
+              setModal({ open: true, mode: 'edit', data: editData });
+            }}
             title="Edit Policy"
           >
             edit
@@ -197,6 +264,7 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
               <input
                 type={type}
                 placeholder={placeholder}
+                autoFocus={k === 'policy_no'}
                 className={`w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-body-md text-sm ${
                   errors[k] ? 'border-error focus:border-error' : ''
                 }`}
@@ -218,15 +286,15 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SR</label>
-            <SearchableDropdown id="pol-sr" options={srOpts} value={modal.data.sr_id} onChange={v=>set('sr_id',v)} placeholder="Select SR…"/>
+            <SearchableDropdown id="pol-sr" options={srOpts} value={modal.data.sr_id} onChange={handleSRChange} placeholder="Select SR…"/>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SM</label>
-            <SearchableDropdown id="pol-sm" options={smOpts} value={modal.data.sm_id} onChange={v=>set('sm_id',v)} placeholder="Select SM…"/>
+            <SearchableDropdown id="pol-sm" options={smOpts} value={modal.data.sm_id} onChange={handleSMChange} placeholder="Select SM…"/>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SSM</label>
-            <SearchableDropdown id="pol-ssm" options={ssmOpts} value={modal.data.ssm_id} onChange={v=>set('ssm_id',v)} placeholder="Select SSM…"/>
+            <SearchableDropdown id="pol-ssm" options={ssmOpts} value={modal.data.ssm_id} onChange={handleSSMChange} placeholder="Select SSM…"/>
           </div>
         </div>
       </Modal>

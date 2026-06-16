@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const ROLES = ['SR', 'SM', 'SSM'];
+const ROLES = ['SR', 'SM', 'SSM', 'AM'];
 
 function today() { return new Date().toISOString().split('T')[0]; }
 function monthStart() {
@@ -26,7 +26,8 @@ export default function BusinessFigure() {
       let data;
       if (role === 'SR') data = await api.srFigure({ from, to });
       else if (role === 'SM') data = await api.smFigure({ from, to });
-      else data = await api.ssmFigure({ from, to });
+      else if (role === 'SSM') data = await api.ssmFigure({ from, to });
+      else data = await api.amFigure({ from, to });
       setRows(data || []);
     } catch {
       toast('Failed to load business figures', 'error');
@@ -39,9 +40,38 @@ export default function BusinessFigure() {
     load();
   }, [load]);
 
+  const filtered = rows.filter(r => {
+    if (!search) return true;
+    const name = r.sr_name || r.sm_name || r.ssm_name || r.am_name || '';
+    const code = r.sr_code || r.sm_code || r.ssm_code || r.am_code || '';
+    return name.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase());
+  });
+
+  // Grand totals
+  const grandTotal = filtered.reduce((acc, r) => ({
+    total_business: acc.total_business + (r.total_business || 0),
+    no_of_policies: acc.no_of_policies + (r.no_of_policies || 0),
+    second_year_premium: acc.second_year_premium + (r.second_year_premium || 0),
+  }), { total_business: 0, no_of_policies: 0, second_year_premium: 0 });
+
+  // Append grand total row
+  const displayRows = filtered.length ? [
+    ...filtered,
+    {
+      id: '__grand__',
+      sr_code: '', sm_code: '', ssm_code: '', am_code: '',
+      sr_name: 'GRAND TOTAL', sm_name: 'GRAND TOTAL', ssm_name: 'GRAND TOTAL', am_name: 'GRAND TOTAL',
+      ssm_code_ref: '', sm_code_ref: '',
+      total_business: grandTotal.total_business,
+      no_of_policies: grandTotal.no_of_policies,
+      no_of_srs_added: '', no_of_sms_added: '', no_of_ssms_added: '',
+      second_year_premium: grandTotal.second_year_premium,
+    }
+  ] : [];
+
   const handleExportPDF = async () => {
     toast('Generating PDF performance report...', 'info');
-    const res = await api.exportBusinessPDF({ from, to, role, data: filtered });
+    const res = await api.exportBusinessPDF({ from, to, role, data: displayRows });
     if (res?.ok) {
       toast(`PDF saved to: ${res.path}`, 'success');
     } else if (res?.ok === false && res?.canceled) {
@@ -53,7 +83,7 @@ export default function BusinessFigure() {
 
   const handleExportExcel = async () => {
     toast('Generating Excel performance report...', 'info');
-    const res = await api.exportBusinessExcel({ from, to, role, data: filtered });
+    const res = await api.exportBusinessExcel({ from, to, role, data: displayRows });
     if (res?.ok) {
       toast(`Excel saved to: ${res.path}`, 'success');
     } else if (res?.ok === false && res?.canceled) {
@@ -62,20 +92,6 @@ export default function BusinessFigure() {
       toast(res?.error || 'Excel export failed', 'error');
     }
   };
-
-  const filtered = rows.filter(r => {
-    if (!search) return true;
-    const name = r.sr_name || r.sm_name || r.ssm_name || '';
-    const code = r.sr_code || r.sm_code || r.ssm_code || '';
-    return name.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase());
-  });
-
-  // Grand totals
-  const grandTotal = filtered.reduce((acc, r) => ({
-    total_business: acc.total_business + (r.total_business || 0),
-    no_of_policies: acc.no_of_policies + (r.no_of_policies || 0),
-    second_year_premium: acc.second_year_premium + (r.second_year_premium || 0),
-  }), { total_business: 0, no_of_policies: 0, second_year_premium: 0 });
 
   const srCols = [
     { key: 'sr_code', label: 'SR Code' },
@@ -105,22 +121,20 @@ export default function BusinessFigure() {
     { key: 'second_year_premium', label: '2nd Year Premium', render: v => fmt(v) },
   ];
 
-  const columns = role === 'SR' ? srCols : role === 'SM' ? smCols : ssmCols;
+  const amCols = [
+    { key: 'am_code', label: 'AM Code' },
+    { key: 'am_name', label: 'AM Name' },
+    { key: 'no_of_ssms_added', label: 'SSMs Added' },
+    { key: 'no_of_sms_added', label: 'SMs Added' },
+    { key: 'no_of_srs_added', label: 'SRs Added' },
+    { key: 'total_business', label: 'Total Business', render: v => fmt(v) },
+    { key: 'no_of_policies', label: 'No of Policies' },
+    { key: 'second_year_premium', label: '2nd Year Premium', render: v => fmt(v) },
+  ];
 
-  // Append grand total row
-  const displayRows = filtered.length ? [
-    ...filtered,
-    {
-      id: '__grand__',
-      sr_code: '', sm_code: '', ssm_code: '',
-      sr_name: 'GRAND TOTAL', sm_name: 'GRAND TOTAL', ssm_name: 'GRAND TOTAL',
-      am_name: '', ssm_code_ref: '', sm_code_ref: '',
-      total_business: grandTotal.total_business,
-      no_of_policies: grandTotal.no_of_policies,
-      no_of_srs_added: '', no_of_sms_added: '',
-      second_year_premium: grandTotal.second_year_premium,
-    }
-  ] : [];
+  const columns = role === 'SR' ? srCols : role === 'SM' ? smCols : role === 'SSM' ? ssmCols : amCols;
+
+
 
   return (
     <div className="space-y-6">
@@ -140,7 +154,7 @@ export default function BusinessFigure() {
                   onChange={e => setFrom(e.target.value)}
                 />
               </div>
-              <span className="text-outline-variant">to</span>
+              <span className="text-on-surface-variant font-medium mx-1">to</span>
               <div className="relative">
                 <input
                   id="bf-to"
@@ -156,15 +170,15 @@ export default function BusinessFigure() {
           {/* Role Filters */}
           <div className="space-y-2">
             <label className="font-label-caps text-label-caps text-on-surface-variant opacity-70">ROLE FILTER</label>
-            <div className="flex gap-1 bg-surface-deep p-1 rounded-lg border border-border-subtle">
+            <div className="flex bg-deep-charcoal p-1 rounded-lg border border-outline-variant">
               {ROLES.map(r => (
                 <button
                   key={r}
                   id={`bf-role-${r}`}
-                  className={`px-6 py-1.5 rounded font-body-md transition-all ${
+                  className={`px-6 py-1.5 rounded-md font-semibold text-xs tracking-wider transition-all ${
                     role === r
-                      ? 'text-primary bg-primary-container/20 border border-primary/30'
-                      : 'text-on-surface-variant hover:bg-surface-variant'
+                      ? 'bg-electric-blue text-white shadow-sm'
+                      : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                   onClick={() => {
                     setRole(r);
@@ -189,14 +203,6 @@ export default function BusinessFigure() {
           >
             <span className="material-symbols-outlined text-[18px]">history</span>
             Reset
-          </button>
-          <button
-            id="btn-bf-generate"
-            className="flex items-center gap-2 bg-primary text-on-primary px-6 py-2 rounded font-bold hover:opacity-90 transition-opacity"
-            onClick={load}
-          >
-            <span className="material-symbols-outlined text-[18px]">refresh</span>
-            Generate
           </button>
           <button
             id="btn-bf-pdf"

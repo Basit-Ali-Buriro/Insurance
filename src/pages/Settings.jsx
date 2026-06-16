@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
-import { ConfirmDialog } from '../components/Modal.jsx';
 
 export default function Settings({ user, onProfileUpdate }) {
   const toast = useToast();
@@ -48,51 +47,6 @@ export default function Settings({ user, onProfileUpdate }) {
 
   const toggle = (k) => setShowPwd(v => ({ ...v, [k]: !v[k] }));
   const setPwd = (k, v) => { setPwdForm(f=>({...f,[k]:v})); setPwdErrors(e=>({...e,[k]:undefined})); };
-
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showSeedConfirm, setShowSeedConfirm] = useState(false);
-
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    if (newTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
-      document.documentElement.classList.add('dark');
-    }
-    toast(`${newTheme === 'light' ? 'Arctic Light' : 'Sentinel Dark'} theme applied`, 'success');
-  };
-
-  const handleConfirmReset = async () => {
-    setShowResetConfirm(false);
-    try {
-      const res = await api.resetDatabase();
-      if (res.ok) {
-        toast('Database cleared successfully!', 'success');
-      } else {
-        toast(res.error || 'Database reset failed', 'error');
-      }
-    } catch {
-      toast('Failed to clear database', 'error');
-    }
-  };
-
-  const handleConfirmSeed = async () => {
-    setShowSeedConfirm(false);
-    try {
-      const res = await api.seedDatabase();
-      if (res.ok) {
-        toast('Database seeded with sample data successfully!', 'success');
-      } else {
-        toast(res.error || 'Database seeding failed', 'error');
-      }
-    } catch {
-      toast('Failed to seed database', 'error');
-    }
-  };
 
   // Generate initials for avatar fallback
   const initials = user?.name
@@ -159,9 +113,9 @@ export default function Settings({ user, onProfileUpdate }) {
           <div className="p-4 bg-surface-container-low border-t border-border-subtle flex justify-end">
             <button
               id="btn-save-profile"
-              className="px-5 py-2 bg-primary text-on-primary font-bold rounded-lg font-body-md text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all outline-none"
+              className="px-5 py-2 bg-primary text-on-primary font-bold rounded-lg font-body-md text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all outline-none disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={handleSaveProfile}
-              disabled={savingP}
+              disabled={savingP || (profile.name.trim() === (user?.name || '') && profile.username.trim() === (user?.username || ''))}
             >
               {savingP ? 'Saving Profile…' : 'Save Profile'}
             </button>
@@ -261,123 +215,110 @@ export default function Settings({ user, onProfileUpdate }) {
             </button>
           </div>
         </div>
+      </div>
 
-        {/* System Preferences (Col 12) */}
-        <div className="lg:col-span-12 bg-surface-bright border border-border-subtle rounded-xl flex flex-col shadow-sm">
+      {/* Row 2: System Operations & Developer support */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* System Operations & Data Integrity (Col 7) */}
+        <div className="lg:col-span-7 bg-surface-bright border border-border-subtle rounded-xl flex flex-col shadow-sm">
           <div className="h-12 px-6 flex items-center justify-between border-b border-border-subtle bg-surface-container-high/30">
-            <span className="text-label-caps font-label-caps text-primary uppercase tracking-wider font-bold">System Preferences</span>
-            <span className="material-symbols-outlined text-outline text-[20px]">settings_suggest</span>
+            <span className="text-label-caps font-label-caps text-primary uppercase tracking-wider font-bold">System Operations & Data Integrity</span>
+            <span className="material-symbols-outlined text-outline text-[20px]">database</span>
           </div>
-          
-          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-xs">
-            {/* Appearance */}
-            <div className="space-y-4">
-              <h4 className="text-body-md font-bold text-on-surface flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-base">dark_mode</span> Interface Styling
-              </h4>
-              <div className="grid grid-cols-2 gap-3">
-                <div
-                  className={`flex flex-col gap-2 p-2 rounded-lg border-2 cursor-pointer transition-all ${
-                    theme === 'dark' ? 'border-primary bg-surface-container-highest' : 'border-border-subtle bg-transparent hover:bg-surface-container/30'
-                  }`}
-                  onClick={() => handleThemeChange('dark')}
+          <div className="p-6 space-y-6 flex-1">
+            {/* Backup & Restore Section */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-on-surface">Data Backup & Recovery</h4>
+              <p className="text-xs text-on-surface-variant">Manage database backups. You can download the current system state or restore from a previously saved archive.</p>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <button
+                  id="btn-settings-backup"
+                  className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-primary border border-primary/20 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-primary/10 transition-all active:scale-95 outline-none"
+                  onClick={async () => {
+                    toast('Downloading database backup...', 'info');
+                    const res = await api.downloadBackup();
+                    if (res?.ok) toast('Database backup saved successfully', 'success');
+                    else if (res?.ok === false) toast('Backup cancelled', 'info');
+                    else toast('Database backup failed', 'error');
+                  }}
                 >
-                  <div className="w-full aspect-video bg-[#020617] rounded-md border border-border-subtle p-1">
-                    <div className="w-full h-full bg-[#122131] rounded-sm"></div>
-                  </div>
-                  <span className={`text-[10px] font-bold text-center ${theme === 'dark' ? 'text-primary' : 'text-outline'}`}>Sentinel Dark</span>
+                  <span className="material-symbols-outlined text-sm">cloud_download</span> Download Backup
+                </button>
+                <button
+                  id="btn-settings-restore"
+                  className="flex items-center gap-2 px-4 py-2 bg-electric-blue text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-electric-blue/20 outline-none"
+                  onClick={async () => {
+                    if (confirm("WARNING: Restoring a backup will overwrite all current policies, proposals, and team records. Are you sure you want to proceed?")) {
+                      toast('Restoring database from backup...', 'info');
+                      const res = await api.restoreBackup();
+                      if (res?.ok) {
+                        toast('Database restored successfully! Reloading system...', 'success');
+                        setTimeout(() => { window.location.reload(); }, 1500);
+                      } else if (res?.canceled) {
+                        toast('Restore operation cancelled', 'info');
+                      } else {
+                        toast(res?.error || 'Restore failed', 'error');
+                      }
+                    }
+                  }}
+                >
+                  <span className="material-symbols-outlined text-sm">settings_backup_restore</span> Restore Backup
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Developer Contact Info (Col 5) */}
+        <div className="lg:col-span-5 bg-surface-bright border border-border-subtle rounded-xl flex flex-col shadow-sm">
+          <div className="h-12 px-6 flex items-center justify-between border-b border-border-subtle bg-surface-container-high/30">
+            <span className="text-label-caps font-label-caps text-primary uppercase tracking-wider font-bold">Developer Support</span>
+            <span className="material-symbols-outlined text-outline text-[20px]">support_agent</span>
+          </div>
+          <div className="p-6 space-y-4 flex-1 flex flex-col justify-center">
+            {/* Dev 1 */}
+            <div className="p-4 bg-surface-deep border border-outline-variant/30 rounded-lg relative overflow-hidden group">
+              <span className="material-symbols-outlined text-[64px] absolute right-2 bottom-[-10px] opacity-5 text-primary group-hover:scale-110 transition-transform duration-300">code</span>
+              <h5 className="font-bold text-on-surface text-sm">Subhash Prem</h5>
+              <p className="text-[10px] uppercase text-primary font-bold tracking-widest mt-0.5">Software Architect</p>
+              <div className="mt-3 space-y-1.5 text-xs text-on-surface-variant font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-outline">call</span>
+                  <a href="tel:03337104578" className="hover:text-electric-blue transition-colors">0333-7104578</a>
+                  <span className="text-outline-variant">/</span>
+                  <a href="tel:03152967527" className="hover:text-electric-blue transition-colors">0315-2967527</a>
                 </div>
-                
-                <div
-                  className={`flex flex-col gap-2 p-2 rounded-lg border-2 cursor-pointer transition-all ${
-                    theme === 'light' ? 'border-primary bg-surface-container-highest' : 'border-border-subtle bg-transparent hover:bg-surface-container/30'
-                  }`}
-                  onClick={() => handleThemeChange('light')}
-                >
-                  <div className="w-full aspect-video bg-white rounded-md border border-gray-200 p-1">
-                    <div className="w-full h-full bg-gray-100 rounded-sm"></div>
-                  </div>
-                  <span className={`text-[10px] font-bold text-center ${theme === 'light' ? 'text-primary' : 'text-outline'}`}>Arctic Light</span>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-outline">mail</span>
+                  <a href="mailto:premlalwani291@gmail.com" className="hover:text-electric-blue transition-colors">premlalwani291@gmail.com</a>
                 </div>
               </div>
             </div>
 
-            {/* regional settings - read-only mockup */}
-            <div className="space-y-4 opacity-65 pointer-events-none select-none">
-              <h4 className="text-body-md font-bold text-on-surface flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-base">language</span> Regional Settings
-              </h4>
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-[9px] uppercase font-bold text-outline">Interface Language</label>
-                  <select className="w-full bg-surface-deep border border-border-subtle rounded px-3 py-1.5 text-xs focus:ring-0 outline-none" defaultValue="en">
-                    <option value="en">English (United States)</option>
-                  </select>
+            {/* Dev 2 */}
+            <div className="p-4 bg-surface-deep border border-outline-variant/30 rounded-lg relative overflow-hidden group">
+              <span className="material-symbols-outlined text-[64px] absolute right-2 bottom-[-10px] opacity-5 text-primary group-hover:scale-110 transition-transform duration-300">terminal</span>
+              <h5 className="font-bold text-on-surface text-sm">Basit Ali</h5>
+              <p className="text-[10px] uppercase text-primary font-bold tracking-widest mt-0.5">Full Stack Developer</p>
+              <div className="mt-3 space-y-1.5 text-xs text-on-surface-variant font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-outline">call</span>
+                  <a href="tel:03243859337" className="hover:text-electric-blue transition-colors">0324-3859337</a>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[9px] uppercase font-bold text-outline">System Time Zone</label>
-                  <select className="w-full bg-surface-deep border border-border-subtle rounded px-3 py-1.5 text-xs focus:ring-0 outline-none" defaultValue="utc">
-                    <option value="utc">Coordinated Universal Time (UTC)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* regional settings */}
-            <div className="space-y-4">
-              <h4 className="text-body-md font-bold text-on-surface flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-base">database</span> Data Integrity
-              </h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 rounded bg-surface-deep border border-border-subtle opacity-65 pointer-events-none select-none">
-                  <div>
-                    <p className="font-bold text-on-surface">Export Security Log</p>
-                    <p className="text-[10px] text-outline mt-0.5">Generates encrypted CSV details</p>
-                  </div>
-                  <span className="material-symbols-outlined text-outline">download</span>
-                </div>
-                <div 
-                  className="flex items-center justify-between p-3 rounded bg-surface-deep border border-border-subtle cursor-pointer hover:border-primary group transition-all"
-                  onClick={() => setShowSeedConfirm(true)}
-                >
-                  <div>
-                    <p className="font-bold text-on-surface group-hover:text-primary transition-colors">Seed Sample Data</p>
-                    <p className="text-[10px] text-outline mt-0.5">Populates the database with sample managers, agents, and policies</p>
-                  </div>
-                  <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">database</span>
-                </div>
-                <div 
-                  className="flex items-center justify-between p-3 rounded bg-surface-deep border border-border-subtle cursor-pointer hover:border-error group transition-all"
-                  onClick={() => setShowResetConfirm(true)}
-                >
-                  <div>
-                    <p className="font-bold text-on-surface group-hover:text-error transition-colors">Reset System Database</p>
-                    <p className="text-[10px] text-outline mt-0.5">Wipes all policy, proposer, and team records</p>
-                  </div>
-                  <span className="material-symbols-outlined text-outline group-hover:text-error transition-colors">delete_forever</span>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-outline">mail</span>
+                  <a href="mailto:basit.web24@gmail.com" className="hover:text-electric-blue transition-colors">basit.web24@gmail.com</a>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <ConfirmDialog
-        open={showResetConfirm}
-        onClose={() => setShowResetConfirm(false)}
-        onConfirm={handleConfirmReset}
-        title="Reset System Database"
-        message="Are you sure you want to reset the database? This will permanently delete all policies, proposals, and team records. Logged-in users will not be affected."
-      />
 
-      <ConfirmDialog
-        open={showSeedConfirm}
-        onClose={() => setShowSeedConfirm(false)}
-        onConfirm={handleConfirmSeed}
-        title="Seed Sample Data"
-        message="Are you sure you want to seed the database with sample data? This will clear all existing policies, proposals, and team records before adding standard test records."
-      />
+      {/* Copyright Footer */}
+      <div className="w-full text-center py-4 border-t border-border-subtle/50 text-[10px] text-outline uppercase tracking-widest font-semibold">
+        © 2026 Lalwani Software Solutions.
+      </div>
     </div>
   );
 }
-

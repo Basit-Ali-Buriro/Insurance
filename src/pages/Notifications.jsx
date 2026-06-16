@@ -36,6 +36,7 @@ export default function Notifications() {
       name: item.holder_name,
       policyNo: item.policy_no,
       dueDate: item.due_date,
+      premium: item.premium,
     });
     await api.markWhatsapp(item.id);
     toast('WhatsApp opened. Reminder marked as sent.', 'success');
@@ -131,7 +132,7 @@ export default function Notifications() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-y-2 gap-x-6 text-body-md text-on-surface-variant">
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-y-2 gap-x-6 text-body-md text-on-surface-variant">
                       <div>
                         <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">Policy No</span>
                         <span className="font-mono-data text-mono-data text-primary-fixed-dim">{item.policy_no}</span>
@@ -139,6 +140,10 @@ export default function Notifications() {
                       <div>
                         <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">Contact</span>
                         <span className="font-mono-data text-mono-data">{item.contact_1 || '—'}</span>
+                      </div>
+                      <div>
+                        <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">Premium</span>
+                        <span className="font-mono-data text-mono-data text-primary">Rs. {Number(item.premium || 0).toLocaleString()}</span>
                       </div>
                       <div>
                         <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">Due Date</span>

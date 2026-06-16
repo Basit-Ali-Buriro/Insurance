@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Proposer Register | Nexus ERP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Outfit:wght@600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#6c228c",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#929090",
+                    "on-primary-fixed": "#001a41",
+                    "on-primary": "#002e69",
+                    "on-secondary-container": "#e59dff",
+                    "secondary-fixed": "#f8d8ff",
+                    "on-tertiary-container": "#2a2a29",
+                    "on-surface": "#e4e1ea",
+                    "tertiary-fixed": "#e5e2e1",
+                    "deep-charcoal": "#0F0F12",
+                    "inverse-surface": "#e4e1ea",
+                    "surface-container-lowest": "#0d0e13",
+                    "on-error-container": "#ffdad6",
+                    "secondary-container": "#6f258e",
+                    "electric-blue": "#007AFF",
+                    "on-error": "#690005",
+                    "surface-container-high": "#2a2930",
+                    "outline": "#8b90a0",
+                    "surface": "#131319",
+                    "royal-purple": "#8E44AD",
+                    "inverse-on-surface": "#303036",
+                    "emerald-green": "#10B981",
+                    "primary": "#adc6ff",
+                    "surface-container-highest": "#34343b",
+                    "surface-bright": "#39383f",
+                    "secondary-fixed-dim": "#ecb2ff",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "surface-dim": "#131319",
+                    "on-secondary-fixed": "#320047",
+                    "secondary": "#ecb2ff",
+                    "on-tertiary": "#313030",
+                    "surface-tint": "#adc6ff",
+                    "tertiary": "#c8c6c5",
+                    "error-container": "#93000a",
+                    "surface-container-low": "#1b1b21",
+                    "on-surface-variant": "#c1c6d7",
+                    "slate-gray": "#1E1E24",
+                    "primary-container": "#4b8eff",
+                    "inverse-primary": "#005bc1",
+                    "surface-container": "#1f1f25",
+                    "on-primary-container": "#00285c",
+                    "surface-variant": "#34343b",
+                    "vivid-orange": "#F59E0B",
+                    "primary-fixed-dim": "#adc6ff",
+                    "outline-variant": "#414755",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "on-secondary": "#520071",
+                    "on-background": "#e4e1ea",
+                    "background": "#131319",
+                    "crimson-red": "#EF4444",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-tertiary-fixed-variant": "#474646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "sidebar-width": "260px",
+                    "md": "16px",
+                    "unit": "4px",
+                    "table-row-height": "40px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Outfit"],
+                    "label-lg": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "headline-lg": ["Outfit"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0F0F12;
+            color: #e4e1ea;
+            scrollbar-width: thin;
+            scrollbar-color: #414755 #0F0F12;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0F0F12;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #414755;
+            border-radius: 10px;
+        }
+        .table-sticky-header thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .glass-card {
+            background: rgba(30, 30, 36, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .search-highlight {
+            animation: highlightFade 4s ease-out forwards;
+        }
+        @keyframes highlightFade {
+            0% { background-color: rgba(245, 158, 11, 0.3); }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center w-full px-lg h-14 sticky top-0 z-50 bg-deep-charcoal dark:bg-deep-charcoal border-b border-outline-variant">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Nexus ERP</span>
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-deep-charcoal border border-outline-variant rounded-lg pl-10 pr-md py-1.5 font-label-md text-label-md focus:ring-1 focus:ring-electric-blue focus:border-electric-blue w-64 transition-all" placeholder="Global Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm rounded-lg hover:bg-slate-gray transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">edit_square</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-slate-gray transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">dark_mode</span>
+</button>
+<button class="p-sm rounded-lg hover:bg-slate-gray transition-colors group relative">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-crimson-red rounded-full"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-electric-blue flex items-center justify-center font-bold text-white ml-sm border border-outline-variant">
+<img alt="Administrator Profile" class="rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARbFz-mYxMt82wIDewAh4TojYd1SVQCRe65x4d2bHh4ou_Jogt9vkSdFdjst4gbKqS-L4A1LRnF8Q5pAdqVHz8rQ0bxtExTK_SVVNBlFhThGizbz8KZb7FbjWk7bya-A_LGY1JjkQi-w8I4CfmteOR7pr88yn8VEgf-pF3zKoJvxbAQWv1rtuo3SCU8wLXwGwH9ARABIJDeVTJDcQIyvfp0Z1RzlRS6UQwctAkVwAYI7nj--nWoOBkgrqileh7odGUlFBGfWMJLis"/>
+</div>
+</div>
+</header>
+<div class="flex h-[calc(100vh-56px)] overflow-hidden">
+<!-- SideNavBar Shell -->
+<nav class="flex flex-col h-full w-sidebar-width shrink-0 z-40 bg-slate-gray dark:bg-slate-gray border-r border-outline-variant">
+<div class="p-lg">
+<div class="flex items-center gap-md mb-xl">
+<div class="w-10 h-10 rounded-lg bg-deep-charcoal flex items-center justify-center text-electric-blue border border-outline-variant">
+<span class="material-symbols-outlined">shield_person</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Enterprise Admin</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">License: Active</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<div class="px-sm space-y-1">
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+<!-- Active State: Proposer Register -->
+<a class="flex items-center text-on-surface bg-deep-charcoal border-l-4 border-electric-blue py-md px-lg transition-all rounded-r-lg group" href="#">
+<span class="material-symbols-outlined mr-md text-electric-blue">person_book</span>
+<span class="font-label-lg text-label-lg">Proposer Register</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">policy</span>
+<span class="font-label-lg text-label-lg">Policy Register</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">group</span>
+<span class="font-label-lg text-label-lg">Show Team</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">map</span>
+<span class="font-label-lg text-label-lg">Area Manager</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">analytics</span>
+<span class="font-label-lg text-label-lg">Business Reports</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg hover:bg-surface-container-high transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</div>
+</div>
+<div class="p-lg mt-auto border-t border-outline-variant space-y-md">
+<button class="w-full bg-electric-blue text-white py-sm rounded-lg font-label-lg text-label-lg hover:opacity-90 transition-opacity">Renew License</button>
+<div class="space-y-xs">
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-xs px-sm transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mr-md text-sm">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-xs px-sm transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mr-md text-sm">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-hidden relative flex flex-col">
+<!-- Page Header Area -->
+<div class="px-xl pt-xl pb-lg flex justify-between items-end">
+<div class="space-y-sm">
+<nav class="flex items-center gap-xs text-on-surface-variant font-label-sm text-label-sm">
+<span>Nexus ERP</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-on-surface">Proposer Register</span>
+</nav>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Proposer Register</h1>
+</div>
+<div class="flex gap-md items-center">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline text-[20px]">filter_list</span>
+<input class="bg-slate-gray border border-outline-variant rounded-lg pl-10 pr-md py-2 font-label-md text-label-md focus:ring-2 focus:ring-electric-blue focus:border-electric-blue w-72 transition-all" placeholder="Filter records..." type="text"/>
+</div>
+<button class="flex items-center gap-sm bg-electric-blue text-white px-lg py-2 rounded-lg font-label-lg text-label-lg hover:shadow-[0_0_15px_rgba(0,122,255,0.4)] transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+<span>Add Proposal</span>
+</button>
+</div>
+</div>
+<!-- Dashboard Analytics Peek (ERP Bento style) -->
+<div class="px-xl mb-xl grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="glass-card p-md rounded-xl border border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Proposals</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-xs">1,284</p>
+</div>
+<div class="p-sm rounded-lg bg-electric-blue/10 text-electric-blue">
+<span class="material-symbols-outlined">description</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl border border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pending OK</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-xs">42</p>
+</div>
+<div class="p-sm rounded-lg bg-vivid-orange/10 text-vivid-orange">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl border border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Converted Ratio</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-xs">84.2%</p>
+</div>
+<div class="p-sm rounded-lg bg-emerald-green/10 text-emerald-green">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl border border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Flagged Issues</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-xs">18</p>
+</div>
+<div class="p-sm rounded-lg bg-crimson-red/10 text-crimson-red">
+<span class="material-symbols-outlined">error</span>
+</div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="flex-1 px-xl pb-xl overflow-hidden">
+<div class="bg-slate-gray border border-outline-variant rounded-xl flex flex-col h-full overflow-hidden shadow-2xl">
+<div class="overflow-x-auto overflow-y-auto custom-scrollbar h-full table-sticky-header">
+<table class="w-full text-left border-collapse min-w-[1000px]">
+<thead class="bg-surface-container-high">
+<tr>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Proposal No</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Holder Name</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Premium</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">PR No</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Date</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Type</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">SR/SM/SSM</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase">Status</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Table Row 1 (Ok Status) -->
+<tr class="hover:bg-deep-charcoal/50 transition-colors group h-table-row-height">
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">PRP-2024-001</td>
+<td class="px-md py-md font-label-lg text-label-lg text-on-surface">Alexander Hamilton</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">$12,450.00</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface-variant">REC-99812</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">24 May 2024</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-0.5 rounded text-[11px] font-bold bg-primary-container/20 text-primary border border-primary/30 uppercase">Cheque</span>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">SM-John Doe</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-emerald-green">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Ok</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<button class="bg-electric-blue/10 text-electric-blue hover:bg-electric-blue hover:text-white px-sm py-1 rounded font-label-sm text-label-sm transition-all">Convert to Policy</button>
+</td>
+</tr>
+<!-- Table Row 2 (Not Ok Status) -->
+<tr class="hover:bg-deep-charcoal/50 transition-colors group h-table-row-height">
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">PRP-2024-002</td>
+<td class="px-md py-md font-label-lg text-label-lg text-on-surface">Elena Rodriguez</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">$3,200.00</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface-variant">REC-99844</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">23 May 2024</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-0.5 rounded text-[11px] font-bold bg-secondary-container/20 text-secondary border border-secondary/30 uppercase">Cash</span>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">SSM-Jane Smith</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-crimson-red">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">cancel</span>
+<span class="font-label-md text-label-md">Not Ok</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<button class="text-on-surface-variant hover:text-on-surface px-sm py-1 rounded font-label-sm text-label-sm transition-all opacity-50 cursor-not-allowed">Review Issues</button>
+</td>
+</tr>
+<!-- Repeatable Rows for visual depth -->
+<tr class="hover:bg-deep-charcoal/50 transition-colors group h-table-row-height search-highlight">
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">PRP-2024-003</td>
+<td class="px-md py-md font-label-lg text-label-lg text-on-surface">Marcus Thorne</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface">$28,000.00</td>
+<td class="px-md py-md font-mono-data text-mono-data text-on-surface-variant">REC-99888</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">22 May 2024</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-0.5 rounded text-[11px] font-bold bg-primary-container/20 text-primary border border-primary/30 uppercase">Cheque</span>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">SR-Alan Wake</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-emerald-green">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Ok</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<button class="bg-electric-blue/10 text-electric-blue hover:bg-electric-blue hover:text-white px-sm py-1 rounded font-label-sm text-label-sm transition-all">Convert to Policy</button>
+</td>
+</tr>
+<!-- Generic padding rows -->
+<script>
+                                    const rows = [
+                                        { id: '004', name: 'Sarah Connor', premium: '$5,400.00', pr: 'REC-99901', date: '21 May 2024', type: 'Cash', sm: 'SM-Kyle R', status: 'Ok' },
+                                        { id: '005', name: 'James T. Kirk', premium: '$150.00', pr: 'REC-99902', date: '21 May 2024', type: 'Cheque', sm: 'SR-Spock', status: 'Not Ok' },
+                                        { id: '006', name: 'Bruce Wayne', premium: '$1,200,000.00', pr: 'REC-99903', date: '20 May 2024', type: 'Cheque', sm: 'SSM-Alfred P', status: 'Ok' },
+                                        { id: '007', name: 'Diana Prince', premium: '$4,500.00', pr: 'REC-99904', date: '20 May 2024', type: 'Cash', sm: 'SM-Steve R', status: 'Ok' },
+                                        { id: '008', name: 'Peter Parker', premium: '$50.00', pr: 'REC-99905', date: '19 May 2024', type: 'Cash', sm: 'SR-Ben P', status: 'Not Ok' },
+                                        { id: '009', name: 'Tony Stark', premium: '$850,000.00', pr: 'REC-99906', date: '19 May 2024', type: 'Cheque', sm: 'SSM-Pepper P', status: 'Ok' },
+                                        { id: '010', name: 'Wanda Maximoff', premium: '$9,800.00', pr: 'REC-99907', date: '18 May 2024', type: 'Cash', sm: 'SM-Vision', status: 'Ok' },
+                                        { id: '011', name: 'Arthur Curry', premium: '$2,200.00', pr: 'REC-99908', date: '18 May 2024', type: 'Cheque', sm: 'SR-Mera', status: 'Ok' },
+                                        { id: '012', name: 'Steve Rogers', premium: '$1,000.00', pr: 'REC-99909', date: '17 May 2024', type: 'Cash', sm: 'SM-Bucky B', status: 'Not Ok' }
+                                    ];
+                                    
+                                    rows.forEach(r => {
+                                        document.write(`
+                                            <tr class="hover:bg-deep-charcoal/50 transition-colors group h-table-row-height">
+                                                <td class="px-md py-md font-mono-data text-mono-data text-on-surface">PRP-2024-${r.id}</td>
+                                                <td class="px-md py-md font-label-lg text-label-lg text-on-surface">${r.name}</td>
+                                                <td class="px-md py-md font-mono-data text-mono-data text-on-surface">${r.premium}</td>
+                                                <td class="px-md py-md font-mono-data text-mono-data text-on-surface-variant">${r.pr}</td>
+                                                <td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">${r.date}</td>
+                                                <td class="px-md py-md">
+                                                    <span class="inline-flex items-center px-sm py-0.5 rounded text-[11px] font-bold ${r.type === 'Cash' ? 'bg-secondary-container/20 text-secondary border border-secondary/30' : 'bg-primary-container/20 text-primary border border-primary/30'} uppercase">${r.type}</span>
+                                                </td>
+                                                <td class="px-md py-md font-body-sm text-body-sm text-on-surface-variant">${r.sm}</td>
+                                                <td class="px-md py-md">
+                                                    <div class="flex items-center gap-xs ${r.status === 'Ok' ? 'text-emerald-green' : 'text-crimson-red'}">
+                                                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">${r.status === 'Ok' ? 'check_circle' : 'cancel'}</span>
+                                                        <span class="font-label-md text-label-md">${r.status}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-md py-md text-right">
+                                                    ${r.status === 'Ok' ? 
+                                                        `<button class="bg-electric-blue/10 text-electric-blue hover:bg-electric-blue hover:text-white px-sm py-1 rounded font-label-sm text-label-sm transition-all">Convert to Policy</button>` : 
+                                                        `<button class="text-on-surface-variant hover:text-on-surface px-sm py-1 rounded font-label-sm text-label-sm transition-all opacity-50 cursor-not-allowed">Review Issues</button>`
+                                                    }
+                                                </td>
+                                            </tr>
+                                        `);
+                                    });
+                                </script>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="bg-surface-container-high border-t border-outline-variant px-xl py-sm flex justify-between items-center">
+<p class="font-label-md text-label-md text-on-surface-variant">Showing <span class="text-on-surface font-bold">12</span> of <span class="text-on-surface font-bold">1,284</span> proposals</p>
+<div class="flex items-center gap-sm">
+<button class="p-xs rounded hover:bg-slate-gray text-on-surface-variant transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">first_page</span>
+</button>
+<button class="p-xs rounded hover:bg-slate-gray text-on-surface-variant transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="px-md py-1 bg-deep-charcoal border border-outline-variant rounded font-label-md text-label-md text-on-surface">1</span>
+<button class="p-xs rounded hover:bg-slate-gray text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-xs rounded hover:bg-slate-gray text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-xl right-xl w-14 h-14 bg-electric-blue rounded-full shadow-[0_8px_30px_rgb(0,122,255,0.4)] flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all z-50 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
+<span class="absolute right-full mr-md bg-deep-charcoal border border-outline-variant px-md py-1.5 rounded-lg font-label-md text-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 pointer-events-none">New Proposal</span>
+</button>
+</main>
+</div>
+<!-- Micro-interaction script -->
+<script>
+        // Simple search feedback simulation
+        const searchInput = document.querySelector('input[placeholder="Filter records..."]');
+        searchInput.addEventListener('input', (e) => {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                if(e.target.value.length > 2 && row.innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
+                    row.classList.add('search-highlight');
+                } else {
+                    row.classList.remove('search-highlight');
+                }
+            });
+        });
+
+        // Sticky header glow effect on scroll
+        const scrollContainer = document.querySelector('.overflow-y-auto.custom-scrollbar');
+        scrollContainer.addEventListener('scroll', () => {
+            const header = document.querySelector('thead');
+            if (scrollContainer.scrollTop > 10) {
+                header.classList.add('shadow-xl', 'bg-surface-container-highest');
+            } else {
+                header.classList.remove('shadow-xl', 'bg-surface-container-highest');
+            }
+        });
+    </script>
+</body></html>

@@ -8,6 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        'slate-gray': 'var(--bg-elevated)',
+        'deep-charcoal': 'var(--bg-base)',
+        'electric-blue': '#007AFF',
+        'royal-purple': '#8E44AD',
+        'vivid-orange': '#F59E0B',
+        'crimson-red': '#EF4444',
+        'emerald-green': '#10B981',
         'on-tertiary-fixed': '#111c2d',
         'surface-bright': 'var(--bg-surface)',
         'outline-variant': 'var(--border)',

@@ -1,0 +1,104 @@
+<svg width="680" height="680" viewBox="0 0 680 680" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>LSS — Lalwani Software Solutions</title>
+  <desc>Transparent emblem logo with LSS monogram for Lalwani Software Solutions</desc>
+
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2B7FFF"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#a8c4ff"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#2B7FFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer dashed orbit -->
+  <circle cx="340" cy="320" r="278" fill="none" stroke="#2B7FFF" stroke-width="1" stroke-dasharray="3 10" opacity="0.3"/>
+
+  <!-- Outer ring -->
+  <circle cx="340" cy="320" r="258" fill="none" stroke="url(#ringGrad)" stroke-width="2" opacity="0.9"/>
+
+  <!-- Inner ring -->
+  <circle cx="340" cy="320" r="242" fill="none" stroke="#2B7FFF" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- Badge background -->
+  <circle cx="340" cy="320" r="241" fill="#0d1321" opacity="0.78"/>
+
+  <!-- Hexagon outline -->
+  <polygon points="340,155 452,218 452,344 340,407 228,344 228,218"
+    fill="none" stroke="#2B7FFF" stroke-width="1" opacity="0.15"/>
+
+  <!-- Glow behind LSS -->
+  <circle cx="340" cy="308" r="120" fill="#2B7FFF" opacity="0.07" filter="url(#glow)"/>
+
+  <!-- LSS Monogram -->
+  <text
+    x="340" y="378"
+    text-anchor="middle"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="800"
+    font-size="166"
+    letter-spacing="-4"
+    fill="url(#textGrad)"
+    filter="url(#glow)">LSS</text>
+
+  <!-- Blue underline bar -->
+  <rect x="228" y="396" width="224" height="5" rx="2.5" fill="url(#blueGrad)"/>
+
+  <!-- Circuit dots on bar ends -->
+  <circle cx="222" cy="399" r="5.5" fill="#60a5fa"/>
+  <circle cx="458" cy="399" r="5.5" fill="#60a5fa"/>
+
+  <!-- Cardinal ticks -->
+  <line x1="340" y1="54"  x2="340" y2="72"  stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="340" y1="568" x2="340" y2="586" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="54"  y1="320" x2="72"  y2="320" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="608" y1="320" x2="626" y2="320" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Cardinal dots -->
+  <circle cx="340" cy="56"  r="4" fill="#60a5fa"/>
+  <circle cx="340" cy="584" r="4" fill="#60a5fa"/>
+  <circle cx="56"  cy="320" r="4" fill="#60a5fa"/>
+  <circle cx="624" cy="320" r="4" fill="#60a5fa"/>
+
+  <!-- Diagonal ticks -->
+  <line x1="142" y1="122" x2="154" y2="134" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+  <line x1="538" y1="122" x2="526" y2="134" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+  <line x1="142" y1="518" x2="154" y2="506" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+  <line x1="538" y1="518" x2="526" y2="506" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- LALWANI -->
+  <text
+    x="340" y="468"
+    text-anchor="middle"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-weight="700"
+    font-size="22"
+    letter-spacing="10"
+    fill="#ffffff">LALWANI</text>
+
+  <!-- Flanking rules around LALWANI -->
+  <line x1="160" y1="452" x2="234" y2="452" stroke="#60a5fa" stroke-width="0.8" opacity="0.4"/>
+  <line x1="446" y1="452" x2="520" y2="452" stroke="#60a5fa" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- SOFTWARE SOLUTIONS -->
+  <text
+    x="340" y="498"
+    text-anchor="middle"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-weight="400"
+    font-size="14"
+    letter-spacing="7"
+    fill="#60a5fa">SOFTWARE SOLUTIONS</text>
+
+</svg>

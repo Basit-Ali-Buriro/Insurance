@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import api from '../lib/api.js';
 import { useToast } from '../components/Toast.jsx';
+import logo from '../../assets/logo.svg';
 
-export default function LicenseRenewalPage({ onRenewed }) {
+export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
   const toast   = useToast();
   const [key,     setKey]     = useState('');
   const [error,   setError]   = useState('');
   const [loading, setLoading] = useState(false);
+
+  const machineIdVal = licenseInfo?.machineId || 'FETCHING-MACHINE-ID...';
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(machineIdVal);
+    toast('Machine ID copied to clipboard!', 'success');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,45 +37,73 @@ export default function LicenseRenewalPage({ onRenewed }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-6 bg-[#020617] relative overflow-hidden w-full select-none">
-      {/* Background Atmospheric Effect */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px]" style={{
-          background: 'radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 70%)'
-        }}></div>
+    <div className="font-body-md text-on-surface flex items-center justify-center min-h-screen relative overflow-hidden bg-deep-charcoal w-full select-none selection:bg-electric-blue selection:text-white font-['Outfit']">
+      {/* Background Layer with Shaders */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-tr from-deep-charcoal via-transparent to-electric-blue/10"></div>
+        <div className="absolute inset-0 animate-pulse-slow bg-[radial-gradient(circle_at_50%_50%,rgba(0,122,255,0.1),transparent_70%)]"></div>
       </div>
 
-      {/* Renewal Container */}
-      <main className="relative z-10 w-full max-w-[400px] flex flex-col items-center">
-        {/* Logo & Branding */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-xl bg-error/10 border border-error/20 shadow-inner">
-            <span className="material-symbols-outlined text-error text-[38px] select-none" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-          </div>
-          <h1 className="font-headline-lg text-headline-lg text-on-surface mb-1">License Expired</h1>
-          <p className="font-body-md text-xs text-error tracking-wider uppercase">Immediate Activation Required</p>
+      {/* Main Lock Canvas */}
+      <main className="relative z-10 w-full max-w-[540px] px-md">
+        {/* Brand Identity */}
+        <div className="flex flex-col items-center mb-8">
+          <img src={logo} alt="Lalwani Logo" className="w-28 h-28 mb-4 object-contain rounded-lg shadow-2xl" />
+          <h1 className="text-headline-md text-on-surface font-bold tracking-wider font-['Outfit']">Lalwani</h1>
+          <p className="font-label-md text-label-md text-on-surface-variant mt-1 uppercase tracking-[0.2em] font-medium">Software Solutions</p>
         </div>
 
-        {/* Card */}
-        <div className="w-full p-8 rounded-xl border border-border-subtle bg-surface-container-low/75 backdrop-blur-md shadow-2xl relative overflow-hidden">
-          {/* Subtle internal light line */}
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        {/* Glassmorphism Container */}
+        <div className="glass-panel rounded-xl p-8 shadow-2xl relative overflow-hidden">
+          {/* Alert Header */}
+          <div className="flex items-center gap-4 mb-6 p-4 bg-electric-blue/10 border border-electric-blue/20 rounded-lg">
+            <span className="material-symbols-outlined text-electric-blue" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+            <div>
+              <h2 className="font-headline-sm text-headline-sm text-on-surface leading-tight">License Expired</h2>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">System-wide lock initiated due to subscription lapse.</p>
+            </div>
+          </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+          {/* Machine Context */}
+          <div className="mb-6 space-y-2">
+            <div className="flex justify-between items-center px-1">
+              <span className="font-label-md text-label-md text-on-surface-variant">Unique Machine ID</span>
+              <button 
+                type="button" 
+                className="flex items-center gap-1 font-label-md text-label-md text-electric-blue hover:text-primary-container transition-colors focus:outline-none" 
+                onClick={handleCopy}
+              >
+                <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>COPY</span>
+              </button>
+            </div>
+            <div className="bg-deep-charcoal/80 border border-outline-variant p-4 rounded-lg font-mono text-xs text-primary tracking-wider flex justify-between items-center select-all">
+              <span>{machineIdVal}</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-[18px]">fingerprint</span>
+            </div>
+          </div>
+
+          {/* Renewal Form */}
+          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
             <div className="space-y-2">
-              <label className="font-label-caps text-label-caps text-on-surface-variant block uppercase tracking-wider" htmlFor="renewal-key">Activation Key</label>
-              <input
-                id="renewal-key"
-                type="text"
-                className="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-mono text-sm tracking-wider"
-                placeholder="XXXX-XXXX-XXXX-XXXX"
-                value={key}
-                onChange={e => { setKey(e.target.value); setError(''); }}
-                disabled={loading}
-                autoFocus
-              />
-              <p className="text-[11px] text-outline italic leading-tight">
-                Please contact your software provider to procure a renewal activation key for this machine fingerprint.
+              <label className="font-label-md text-label-md text-on-surface-variant ml-1" htmlFor="license-key">Renewal Key</label>
+              <div className="relative group">
+                <input
+                  className="w-full h-14 bg-deep-charcoal border border-outline-variant rounded-lg px-4 pr-12 font-mono text-body-lg text-on-surface focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all placeholder:text-outline-variant"
+                  id="license-key"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  required
+                  type="text"
+                  value={key}
+                  onChange={e => { setKey(e.target.value); setError(''); }}
+                  disabled={loading}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center text-outline-variant group-focus-within:text-electric-blue pointer-events-none">
+                  <span className="material-symbols-outlined">vpn_key</span>
+                </div>
+              </div>
+              <p className="font-label-sm text-label-sm text-on-surface-variant/60 ml-1 italic">
+                Contact your account manager if you have not received your new key.
               </p>
             </div>
 
@@ -79,36 +115,54 @@ export default function LicenseRenewalPage({ onRenewed }) {
               </div>
             )}
 
-            {/* Submit Button */}
-            <button
-              className="w-full mt-4 bg-error text-white font-bold py-3 rounded-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center space-x-2 uppercase tracking-widest shadow-lg shadow-error/10 text-sm"
-              id="submitBtn"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                  <span>Validating Key…</span>
-                </>
-              ) : (
-                <span>Activate License</span>
-              )}
-            </button>
+            <div className="pt-2">
+              <button
+                className="w-full h-14 bg-gradient-to-r from-electric-blue to-royal-purple hover:brightness-110 text-white font-semibold rounded-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group text-sm uppercase tracking-wider"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                    <span>Verifying License Key...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>ACTIVATE SYSTEM LICENSE</span>
+                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">bolt</span>
+                  </>
+                )}
+              </button>
+            </div>
           </form>
+
+          {/* Footer Actions */}
+          <div className="mt-8 pt-4 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button 
+              className="font-label-md text-label-md text-on-surface-variant hover:text-electric-blue transition-colors flex items-center gap-1 group bg-transparent border-none cursor-pointer" 
+              onClick={() => {
+                const msg = `Assalam o Alaikum Developer, please activate my license. My Machine ID is: ${machineIdVal}`;
+                api.openWhatsAppAlert(msg);
+              }}
+            >
+              <span className="material-symbols-outlined text-[18px]">support_agent</span>
+              <span>Contact Developer Support</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-electric-blue animate-pulse"></div>
+              <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Locked State</span>
+            </div>
+          </div>
         </div>
 
-        {/* System Status Footer */}
-        <div className="mt-8 flex items-center space-x-3 text-xs text-on-surface-variant font-medium select-none">
-          <div className="flex items-center space-x-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div>
-            <span className="text-error">Terminal Locked</span>
-          </div>
-          <span className="text-border-subtle">•</span>
-          <span>v1.0.0-SEC</span>
-        </div>
+        {/* Security Notice */}
+        <p className="mt-6 text-center font-body-sm text-body-sm text-on-surface-variant/40 px-6">
+          This instance of Lalwani Software Solutions is protected by hardware-bound encryption. Unauthorized attempts to bypass this screen will be logged and reported to the system administrator.
+        </p>
+
+        {/* Dynamic Visual Detail */}
+        <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-electric-blue/5 blur-[120px] rounded-full pointer-events-none"></div>
       </main>
     </div>
   );
 }
-

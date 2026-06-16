@@ -4,7 +4,7 @@ import Modal, { ConfirmDialog } from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const EMPTY = { am_code: '', am_name: '', address: '', cnic: '', contact_1: '', contact_2: '', status: 'active' };
+const EMPTY = { am_code: '', am_name: '', address: '', cnic: '', contact_1: '', contact_2: '', status: 'active', license_date: '' };
 
 export default function AreaManager({ searchFilter, clearSearchFilter }) {
   const toast = useToast();
@@ -92,10 +92,13 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
   };
 
   const columns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'am_code', label: 'AM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'am_name', label: 'Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { 
       key: 'status', 
       label: 'Status', 
@@ -107,10 +110,16 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
         </span>
       ) 
     },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+    },
     { key: 'no_of_ssms', label: 'SSMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   return (
@@ -141,6 +150,7 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
         columns={columns} 
         rows={filtered} 
         loading={loading}
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         actions={row => (
           <div className="flex items-center gap-2">
             <button
@@ -167,27 +177,14 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
         onClose={() => setModal(m => ({ ...m, open: false }))} 
         title={modal.mode === 'create' ? 'Add Area Manager' : 'Edit Area Manager'} 
         size="lg"
-        footer={<>
-          <button 
-            className="flex items-center gap-1.5 bg-surface-variant hover:bg-surface-container-highest text-on-surface transition-colors px-4 py-2 rounded" 
-            onClick={() => setModal(m => ({ ...m, open: false }))}
-          >
-            Cancel
-          </button>
-          <button 
-            className="flex items-center gap-1.5 bg-primary text-on-primary font-bold px-5 py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50" 
-            onClick={handleSave} 
-            disabled={saving}
-          >
-            {saving ? <span className="animate-spin h-4 w-4 border-2 border-on-primary border-t-transparent rounded-full" /> : 'Save'}
-          </button>
-        </>}
+        footer={null}
       >
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="form-group">
               <label className="form-label required">AM Code</label>
               <input 
+                autoFocus
                 className={`bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full ${errors.am_code ? 'border-error' : ''}`}
                 value={modal.data.am_code || ''} 
                 onChange={e => set('am_code', e.target.value)} 
@@ -245,6 +242,16 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
                 <option value="inactive">Inactive</option>
               </select>
             </div>
+
+            <div className="form-group">
+              <label className="form-label">License Date</label>
+              <input 
+                type="date"
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.license_date || ''} 
+                onChange={e => set('license_date', e.target.value)} 
+              />
+            </div>
           </div>
 
           <div className="form-group">
@@ -255,6 +262,22 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
               onChange={e => set('address', e.target.value)} 
               rows={2}
             />
+          </div>
+
+          <div className="flex justify-end gap-3 border-t border-border-subtle pt-4">
+            <button 
+              className="flex items-center gap-1.5 bg-surface-variant hover:bg-surface-container-highest text-on-surface transition-colors px-4 py-2 rounded" 
+              onClick={() => setModal(m => ({ ...m, open: false }))}
+            >
+              Cancel
+            </button>
+            <button 
+              className="flex items-center gap-1.5 bg-primary text-on-primary font-bold px-5 py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50" 
+              onClick={handleSave} 
+              disabled={saving}
+            >
+              {saving ? <span className="animate-spin h-4 w-4 border-2 border-on-primary border-t-transparent rounded-full" /> : 'Save'}
+            </button>
           </div>
         </div>
       </Modal>

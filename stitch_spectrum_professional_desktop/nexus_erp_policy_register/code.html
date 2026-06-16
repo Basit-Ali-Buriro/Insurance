@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nexus ERP - Policy Register</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#6c228c",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#929090",
+                    "on-primary-fixed": "#001a41",
+                    "on-primary": "#002e69",
+                    "on-secondary-container": "#e59dff",
+                    "secondary-fixed": "#f8d8ff",
+                    "on-tertiary-container": "#2a2a29",
+                    "on-surface": "#e4e1ea",
+                    "tertiary-fixed": "#e5e2e1",
+                    "deep-charcoal": "#0F0F12",
+                    "inverse-surface": "#e4e1ea",
+                    "surface-container-lowest": "#0d0e13",
+                    "on-error-container": "#ffdad6",
+                    "secondary-container": "#6f258e",
+                    "electric-blue": "#007AFF",
+                    "on-error": "#690005",
+                    "surface-container-high": "#2a2930",
+                    "outline": "#8b90a0",
+                    "surface": "#131319",
+                    "royal-purple": "#8E44AD",
+                    "inverse-on-surface": "#303036",
+                    "emerald-green": "#10B981",
+                    "primary": "#adc6ff",
+                    "surface-container-highest": "#34343b",
+                    "surface-bright": "#39383f",
+                    "secondary-fixed-dim": "#ecb2ff",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "surface-dim": "#131319",
+                    "on-secondary-fixed": "#320047",
+                    "secondary": "#ecb2ff",
+                    "on-tertiary": "#313030",
+                    "surface-tint": "#adc6ff",
+                    "tertiary": "#c8c6c5",
+                    "error-container": "#93000a",
+                    "surface-container-low": "#1b1b21",
+                    "on-surface-variant": "#c1c6d7",
+                    "slate-gray": "#1E1E24",
+                    "primary-container": "#4b8eff",
+                    "inverse-primary": "#005bc1",
+                    "surface-container": "#1f1f25",
+                    "on-primary-container": "#00285c",
+                    "surface-variant": "#34343b",
+                    "vivid-orange": "#F59E0B",
+                    "primary-fixed-dim": "#adc6ff",
+                    "outline-variant": "#414755",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "on-secondary": "#520071",
+                    "on-background": "#e4e1ea",
+                    "background": "#131319",
+                    "crimson-red": "#EF4444",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-tertiary-fixed-variant": "#474646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "sidebar-width": "260px",
+                    "md": "16px",
+                    "unit": "4px",
+                    "table-row-height": "40px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Outfit"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Outfit"],
+                    "label-lg": ["Inter"],
+                    "display-lg": ["Outfit"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "headline-lg": ["Outfit"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #0F0F12; color: #e4e1ea; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .datatable-wrapper { scrollbar-width: thin; scrollbar-color: #414755 #1E1E24; }
+        .status-pill-red { background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; }
+        .status-pill-orange { background-color: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; }
+        .action-menu { opacity: 0; transition: opacity 0.2s ease; }
+        tr:hover .action-menu { opacity: 1; }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-40 bg-slate-gray dark:bg-slate-gray border-r border-outline-variant">
+<div class="p-lg flex flex-col gap-sm">
+<div class="font-headline-sm text-headline-sm font-black text-on-surface mb-md">Nexus ERP</div>
+<div class="flex items-center gap-md p-md bg-deep-charcoal rounded-lg mb-lg border border-outline-variant/30">
+<div class="w-10 h-10 rounded-full bg-electric-blue flex items-center justify-center font-bold text-white">SA</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">System Admin</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Enterprise Admin</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">person_book</span>
+<span class="font-label-lg text-label-lg">Proposer Register</span>
+</a>
+<a class="flex items-center text-on-surface bg-deep-charcoal border-l-4 border-electric-blue py-md px-lg rounded-r-lg group translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined mr-md text-electric-blue">policy</span>
+<span class="font-label-lg text-label-lg">Policy Register</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">group</span>
+<span class="font-label-lg text-label-lg">Show Team</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">map</span>
+<span class="font-label-lg text-label-lg">Area Manager</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">analytics</span>
+<span class="font-label-lg text-label-lg">Business Reports</span>
+</a>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-electric-blue">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-md space-y-1">
+<button class="w-full py-md px-lg bg-electric-blue/10 border border-electric-blue/30 text-electric-blue font-label-md text-label-md rounded-lg hover:bg-electric-blue hover:text-white transition-all mb-lg">
+                Renew License
+            </button>
+<a class="flex items-center text-on-surface-variant hover:text-on-surface py-md px-lg transition-all group" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-label-lg text-label-lg">Support</span>
+</a>
+<a class="flex items-center text-error hover:text-on-error py-md px-lg transition-all group" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-sidebar-width flex-1 flex flex-col h-screen">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-lg h-14 sticky top-0 z-50 bg-deep-charcoal border-b border-outline-variant">
+<div class="flex items-center gap-md flex-1">
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-slate-gray border border-outline-variant/30 rounded-lg pl-10 py-1.5 font-body-sm text-body-sm focus:border-electric-blue focus:ring-1 focus:ring-electric-blue outline-none text-on-surface" placeholder="Search Policy No, Holder Name..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-slate-gray rounded-full transition-colors text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">edit_square</span>
+</button>
+<button class="p-2 hover:bg-slate-gray rounded-full transition-colors text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 hover:bg-slate-gray rounded-full transition-colors text-on-surface-variant hover:text-on-surface relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-crimson-red rounded-full"></span>
+</button>
+</div>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="Close-up portrait of a professional male administrator in a clean office setting, looking confidently at the camera with soft, cinematic lighting and a muted, deep charcoal color palette emphasizing authority and expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEmIkxpnv9NF9VeEyVI3Jqmg5DRZOHDGAPjAE6G9FUKEiINSixjNTUhjlEL9mXzEKMy2acfDL0-c6p6gXBNuE-G9DIom5Nh-TaQHJsvCvRsPKI3kNC2NHiZcgM-pdUXU0T6aABYdtYxFTjSfzulympRv_xEHqnl9TZFpZV669fIFlBqx2EH_N8ukNTu8Ocfp15BRtEXvo8Dekud9FoaB5TWSZPlPFeOELYNmDyPp8xVwjJSt-INRKhNeVbFwkVYo0nSBmnDBqUq5U"/>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-lg flex-1 overflow-hidden flex flex-col gap-lg">
+<!-- Page Header & Stats -->
+<div class="flex justify-between items-end">
+<div class="flex flex-col gap-xs">
+<h1 class="font-headline-md text-headline-md text-on-surface">Policy Register</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Managing 1,248 active insurance policies across regions.</p>
+</div>
+<div class="flex gap-md">
+<div class="flex flex-col items-end px-md border-r border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant">TOTAL PREMIUM</span>
+<span class="font-headline-sm text-headline-sm text-electric-blue">$4.2M</span>
+</div>
+<div class="flex flex-col items-end px-md border-r border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant">DUE 7 DAYS</span>
+<span class="font-headline-sm text-headline-sm text-crimson-red">12</span>
+</div>
+<div class="flex flex-col items-end px-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant">DUE 15 DAYS</span>
+<span class="font-headline-sm text-headline-sm text-vivid-orange">45</span>
+</div>
+</div>
+</div>
+<!-- Policy Table Container -->
+<div class="flex-1 bg-slate-gray border border-outline-variant/30 rounded-xl overflow-hidden flex flex-col shadow-xl">
+<!-- Table Toolbar -->
+<div class="p-md flex justify-between items-center bg-surface-container-high/30 border-b border-outline-variant/20">
+<div class="flex gap-sm">
+<button class="px-md py-sm bg-deep-charcoal border border-outline-variant rounded-lg font-label-md text-label-md flex items-center gap-xs hover:border-electric-blue transition-colors">
+<span class="material-symbols-outlined text-sm">filter_alt</span> Filter
+                        </button>
+<button class="px-md py-sm bg-deep-charcoal border border-outline-variant rounded-lg font-label-md text-label-md flex items-center gap-xs hover:border-electric-blue transition-colors">
+<span class="material-symbols-outlined text-sm">download</span> Export
+                        </button>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+                        Showing <span class="text-on-surface font-bold">1 - 10</span> of 1,248
+                    </div>
+</div>
+<!-- Scrollable Table -->
+<div class="flex-1 overflow-auto datatable-wrapper">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-slate-gray z-10 shadow-sm">
+<tr class="border-b border-outline-variant/50">
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Policy No</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Holder Name</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CNIC</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Premium</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Issue Date</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Due Date</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-center">Table/Term</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Hierarchy</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider w-20">Actions</th>
+</tr>
+</thead>
+<tbody class="font-mono-data text-mono-data">
+<!-- High Urgency Row (7 days) -->
+<tr class="border-b border-outline-variant/20 hover:bg-surface-container transition-colors bg-crimson-red/5">
+<td class="px-md h-table-row-height text-electric-blue font-bold">POL-442981</td>
+<td class="px-md h-table-row-height font-label-md text-label-md text-on-surface">Ahmed Raza Malik</td>
+<td class="px-md h-table-row-height">35202-998123-1</td>
+<td class="px-md h-table-row-height text-right">$12,450.00</td>
+<td class="px-md h-table-row-height">12 May 2022</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 rounded status-pill-red font-bold text-[10px]">12 MAY 2024</span>
+</td>
+<td class="px-md h-table-row-height text-center">T20 / 15Y</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 bg-royal-purple/20 text-royal-purple rounded text-[10px] font-bold">SSM</span>
+</td>
+<td class="px-md h-table-row-height text-center">
+<div class="action-menu flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue cursor-pointer text-lg">visibility</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green cursor-pointer text-lg">edit</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-crimson-red cursor-pointer text-lg">delete</span>
+</div>
+</td>
+</tr>
+<!-- Medium Urgency Row (15 days) -->
+<tr class="border-b border-outline-variant/20 hover:bg-surface-container transition-colors bg-vivid-orange/5">
+<td class="px-md h-table-row-height text-electric-blue font-bold">POL-990123</td>
+<td class="px-md h-table-row-height font-label-md text-label-md text-on-surface">Sara Khan Qureshi</td>
+<td class="px-md h-table-row-height">42101-112009-8</td>
+<td class="px-md h-table-row-height text-right">$8,200.00</td>
+<td class="px-md h-table-row-height">20 Jun 2021</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 rounded status-pill-orange font-bold text-[10px]">20 JUN 2024</span>
+</td>
+<td class="px-md h-table-row-height text-center">T15 / 10Y</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 bg-electric-blue/20 text-electric-blue rounded text-[10px] font-bold">SM</span>
+</td>
+<td class="px-md h-table-row-height text-center">
+<div class="action-menu flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue cursor-pointer text-lg">visibility</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green cursor-pointer text-lg">edit</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-crimson-red cursor-pointer text-lg">delete</span>
+</div>
+</td>
+</tr>
+<!-- Standard Row -->
+<tr class="border-b border-outline-variant/20 hover:bg-surface-container transition-colors">
+<td class="px-md h-table-row-height text-electric-blue font-bold">POL-882104</td>
+<td class="px-md h-table-row-height font-label-md text-label-md text-on-surface">Zeeshan Farooq</td>
+<td class="px-md h-table-row-height">33100-442111-5</td>
+<td class="px-md h-table-row-height text-right">$45,000.00</td>
+<td class="px-md h-table-row-height">05 Jan 2023</td>
+<td class="px-md h-table-row-height text-on-surface-variant">05 JAN 2025</td>
+<td class="px-md h-table-row-height text-center">T50 / 20Y</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 bg-emerald-green/20 text-emerald-green rounded text-[10px] font-bold">SR</span>
+</td>
+<td class="px-md h-table-row-height text-center">
+<div class="action-menu flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue cursor-pointer text-lg">visibility</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green cursor-pointer text-lg">edit</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-crimson-red cursor-pointer text-lg">delete</span>
+</div>
+</td>
+</tr>
+<!-- Additional Dummy Rows -->
+<tr class="border-b border-outline-variant/20 hover:bg-surface-container transition-colors">
+<td class="px-md h-table-row-height text-electric-blue font-bold">POL-112233</td>
+<td class="px-md h-table-row-height font-label-md text-label-md text-on-surface">Maria Iqbal</td>
+<td class="px-md h-table-row-height">61101-772233-4</td>
+<td class="px-md h-table-row-height text-right">$15,750.00</td>
+<td class="px-md h-table-row-height">15 Mar 2023</td>
+<td class="px-md h-table-row-height text-on-surface-variant">15 MAR 2025</td>
+<td class="px-md h-table-row-height text-center">T25 / 12Y</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 bg-royal-purple/20 text-royal-purple rounded text-[10px] font-bold">SSM</span>
+</td>
+<td class="px-md h-table-row-height text-center">
+<div class="action-menu flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue cursor-pointer text-lg">visibility</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green cursor-pointer text-lg">edit</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-crimson-red cursor-pointer text-lg">delete</span>
+</div>
+</td>
+</tr>
+<!-- Loop more rows for density simulation -->
+<tr class="border-b border-outline-variant/20 hover:bg-surface-container transition-colors">
+<td class="px-md h-table-row-height text-electric-blue font-bold">POL-771100</td>
+<td class="px-md h-table-row-height font-label-md text-label-md text-on-surface">Ibrahim Shah</td>
+<td class="px-md h-table-row-height">41303-123456-7</td>
+<td class="px-md h-table-row-height text-right">$2,400.00</td>
+<td class="px-md h-table-row-height">10 Aug 2022</td>
+<td class="px-md h-table-row-height text-on-surface-variant">10 AUG 2024</td>
+<td class="px-md h-table-row-height text-center">T10 / 05Y</td>
+<td class="px-md h-table-row-height">
+<span class="px-2 py-0.5 bg-electric-blue/20 text-electric-blue rounded text-[10px] font-bold">SM</span>
+</td>
+<td class="px-md h-table-row-height text-center">
+<div class="action-menu flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-electric-blue cursor-pointer text-lg">visibility</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green cursor-pointer text-lg">edit</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-crimson-red cursor-pointer text-lg">delete</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer Pagination -->
+<div class="p-md flex justify-between items-center bg-surface-container-high/30 border-t border-outline-variant/20">
+<div class="flex items-center gap-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant">ROWS PER PAGE</span>
+<select class="bg-deep-charcoal border border-outline-variant rounded px-2 py-1 font-label-md text-label-md outline-none">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-deep-charcoal text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">first_page</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-deep-charcoal text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<span class="px-4 font-label-md text-label-md text-on-surface">Page 1 of 125</span>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-deep-charcoal text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-deep-charcoal text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">last_page</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dashboard Style Context Cards (Sub-Footer) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="p-md bg-slate-gray border border-outline-variant/30 rounded-xl flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-emerald-green/10 flex items-center justify-center text-emerald-green">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">RENEWAL RATE</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">94.2%</p>
+</div>
+</div>
+<div class="p-md bg-slate-gray border border-outline-variant/30 rounded-xl flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-royal-purple/10 flex items-center justify-center text-royal-purple">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">VERIFIED POLICIES</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">1,192</p>
+</div>
+</div>
+<div class="p-md bg-slate-gray border border-outline-variant/30 rounded-xl flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-electric-blue/10 flex items-center justify-center text-electric-blue">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">AVG. PREMIUM</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">$3,365</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Micro-interaction Script -->
+<script>
+        // Highlighting logic for search simulation
+        const searchInput = document.querySelector('input[type="text"]');
+        const tableRows = document.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    row.style.display = '';
+                    if (term.length > 2) {
+                        row.classList.add('bg-electric-blue/10');
+                        setTimeout(() => {
+                            row.classList.remove('bg-electric-blue/10');
+                        }, 2000);
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body></html>

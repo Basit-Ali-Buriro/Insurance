@@ -4,27 +4,32 @@ import Modal from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const ROLE_TYPES = ['SR', 'SM', 'SSM'];
+const ROLE_TYPES = ['SR', 'SM', 'SSM', 'AM'];
 
 export default function ShowTeam() {
   const toast = useToast();
   const [roleFilter, setRoleFilter] = useState('SR');
   const [search, setSearch] = useState('');
-  const [data, setData] = useState({ SR: [], SM: [], SSM: [] });
+  const [data, setData] = useState({ SR: [], SM: [], SSM: [], AM: [] });
   const [loading, setLoading] = useState(true);
   const [previewData, setPreviewData] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [srs, sms, ssms] = await Promise.all([api.listSR(), api.listSM(), api.listSSM()]);
-      setData({ SR: srs, SM: sms, SSM: ssms });
+      const [srs, sms, ssms, areaManagers] = await Promise.all([
+        api.listSR(),
+        api.listSM(),
+        api.listSSM(),
+        api.listAM()
+      ]);
+      setData({ SR: srs, SM: sms, SSM: ssms, AM: areaManagers || [] });
     } catch { 
       toast('Failed to load team data', 'error'); 
     } finally { 
       setLoading(false); 
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     load();
@@ -33,16 +38,19 @@ export default function ShowTeam() {
   const rawRows = data[roleFilter] || [];
   const filtered = rawRows.filter(r => {
     if (!search) return true;
-    const name = r.sr_name || r.sm_name || r.ssm_name || '';
-    const code = r.sr_code || r.sm_code || r.ssm_code || '';
+    const name = r.sr_name || r.sm_name || r.ssm_name || r.am_name || '';
+    const code = r.sr_code || r.sm_code || r.ssm_code || r.am_code || '';
     return name.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase());
   });
 
   const srColumns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'sr_code', label: 'SR Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'sr_name', label: 'SR Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { key: 'sm_code', label: 'SM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { key: 'ssm_code', label: 'SSM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
@@ -57,15 +65,23 @@ export default function ShowTeam() {
         </span>
       ) 
     },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+    },
     { key: 'no_of_policies', label: 'Policies', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'second_year_premium', label: '2nd Yr Prem', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   const smColumns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'sm_code', label: 'SM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'sm_name', label: 'SM Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { key: 'ssm_code', label: 'SSM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { 
@@ -79,15 +95,24 @@ export default function ShowTeam() {
         </span>
       ) 
     },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+    },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd Yr Prem', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   const ssmColumns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'ssm_code', label: 'SSM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'ssm_name', label: 'SSM Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { 
       key: 'status', 
@@ -100,12 +125,49 @@ export default function ShowTeam() {
         </span>
       ) 
     },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+    },
     { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
-  const columns = roleFilter === 'SR' ? srColumns : roleFilter === 'SM' ? smColumns : ssmColumns;
+  const amColumns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
+    { key: 'am_code', label: 'AM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
+    { key: 'am_name', label: 'AM Name' },
+    { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
+    { 
+      key: 'status', 
+      label: 'Status', 
+      render: v => (
+        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+          v === 'active' ? 'bg-success/15 text-success' : 'bg-outline-variant/20 text-outline'
+        }`}>
+          {v}
+        </span>
+      ) 
+    },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+    },
+    { key: 'no_of_ssms', label: 'SSMs', render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+  ];
+
+  const columns = roleFilter === 'SR' ? srColumns : roleFilter === 'SM' ? smColumns : roleFilter === 'SSM' ? ssmColumns : amColumns;
 
   return (
     <div className="space-y-6">
@@ -122,15 +184,16 @@ export default function ShowTeam() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex gap-1 bg-surface-container p-1 rounded-lg border border-border-subtle">
+
+          <div className="flex bg-deep-charcoal p-1 rounded-lg border border-outline-variant">
             {ROLE_TYPES.map(t => (
               <button
                 key={t}
                 id={`team-filter-${t}`}
-                className={`px-6 py-1.5 rounded font-body-md transition-all ${
+                className={`px-6 py-1.5 rounded-md font-semibold text-xs tracking-wider transition-all ${
                   roleFilter === t
-                    ? 'text-primary bg-primary-container/20 border border-primary/30'
-                    : 'text-on-surface-variant hover:bg-surface-variant'
+                    ? 'bg-electric-blue text-white shadow-sm'
+                    : 'text-on-surface-variant hover:text-on-surface'
                 }`}
                 onClick={() => {
                   setRoleFilter(t);
@@ -152,8 +215,10 @@ export default function ShowTeam() {
         columns={columns} 
         rows={filtered} 
         loading={loading} 
+        actionsLabel="Documents"
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         emptyMsg={`No ${roleFilter} records found.`}
-        actions={row => (
+        actions={roleFilter === 'AM' ? null : row => (
           <div className="flex items-center gap-2">
             <button
               className="hover:text-primary transition-colors p-1.5 hover:bg-surface-variant/40 rounded flex items-center justify-center"

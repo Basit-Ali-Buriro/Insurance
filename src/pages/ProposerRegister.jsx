@@ -5,7 +5,7 @@ import SearchableDropdown from '../components/SearchableDropdown.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const EMPTY = { proposal_no:'', holder_name:'', premium:'', pr_no:'', pr_date:'', amount_type:'cash', requirements:'', sr_id:null, sm_id:null, ssm_id:null, status:'not_ok' };
+const EMPTY = { proposal_no:'', holder_name:'', premium:'', pr_no:'', pr_date:'', amount_type:'cash', requirements:'', sr_id:null, sm_id:null, ssm_id:null, status:'not_ok', contact_1:'', contact_2:'' };
 
 export default function ProposerRegister({ onNavigate, searchFilter, clearSearchFilter }) {
   const toast = useToast();
@@ -48,7 +48,10 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
     r.holder_name?.toLowerCase().includes(search.toLowerCase()) ||
     r.proposal_no?.toLowerCase().includes(search.toLowerCase()) ||
     r.sr_code?.toLowerCase().includes(search.toLowerCase()) ||
-    r.sm_code?.toLowerCase().includes(search.toLowerCase())
+    r.sm_code?.toLowerCase().includes(search.toLowerCase()) ||
+    r.ssm_code?.toLowerCase().includes(search.toLowerCase()) ||
+    r.contact_1?.toLowerCase().includes(search.toLowerCase()) ||
+    r.contact_2?.toLowerCase().includes(search.toLowerCase())
   );
 
   const validate = (d) => {
@@ -60,6 +63,43 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
   };
 
   const set = (k, v) => { setModal(m=>({...m, data:{...m.data,[k]:v}})); setErrors(e=>({...e,[k]:undefined})); };
+
+  const handleSRChange = (srId) => {
+    setModal(m => {
+      const updatedData = { ...m.data, sr_id: srId };
+      if (srId) {
+        const selectedSR = srs.find(s => s.id === srId);
+        if (selectedSR) {
+          updatedData.sm_id = selectedSR.sm_id || null;
+          updatedData.ssm_id = selectedSR.ssm_id || null;
+        }
+      }
+      return { ...m, data: updatedData };
+    });
+    setErrors(e => ({ ...e, sr_id: undefined, sm_id: undefined, ssm_id: undefined }));
+  };
+
+  const handleSMChange = (smId) => {
+    if (modal.data.sr_id) {
+      const selectedSR = srs.find(s => s.id === modal.data.sr_id);
+      if (selectedSR && selectedSR.sm_id !== smId) {
+        const ok = window.confirm("Are you sure you want to change the SM? This deviates from the selected SR's default hierarchy.");
+        if (!ok) return;
+      }
+    }
+    set('sm_id', smId);
+  };
+
+  const handleSSMChange = (ssmId) => {
+    if (modal.data.sr_id) {
+      const selectedSR = srs.find(s => s.id === modal.data.sr_id);
+      if (selectedSR && selectedSR.ssm_id !== ssmId) {
+        const ok = window.confirm("Are you sure you want to change the SSM? This deviates from the selected SR's default hierarchy.");
+        if (!ok) return;
+      }
+    }
+    set('ssm_id', ssmId);
+  };
 
   const handleSave = async () => {
     const e = validate(modal.data);
@@ -89,6 +129,9 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
     if (res.ok) {
       toast('Proposal converted successfully. Complete the policy record.','success');
       setConvertId(null);
+      if (res.policyId) {
+        window.history.pushState(null, '', `?highlight=${res.policyId}`);
+      }
       onNavigate('policy');
     } else {
       toast(res.error||'Conversion failed','error');
@@ -97,14 +140,19 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
   };
 
   const columns = [
+    { key:'serial_no',    label:'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key:'proposal_no',  label:'Proposal No' },
     { key:'holder_name',  label:'Holder Name' },
+    { key:'contact_1',    label:'Contact 1' },
+    { key:'contact_2',    label:'Contact 2' },
+    { key:'requirements', label:'Requirements' },
     { key:'premium',      label:'Premium', render: v=>`Rs. ${Number(v).toLocaleString()}` },
     { key:'pr_no',        label:'PR No' },
     { key:'pr_date',      label:'PR Date' },
     { key:'amount_type',  label:'Type', render: v=><span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">{v}</span> },
     { key:'sr_code',      label:'SR Code' },
     { key:'sm_code',      label:'SM Code' },
+    { key:'ssm_code',     label:'SSM Code' },
     { key:'status',       label:'Status', render: v=><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${v==='ok'?'bg-success/10 text-success':'bg-warning/10 text-warning'}`}>{v==='not_ok'?'Not OK':'OK'}</span> },
     { key:'converted_to_policy', label:'Converted', render: v=><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${v?'bg-success/15 text-success':'bg-surface-variant/40 text-outline'}`}>{v?'Yes':'No'}</span> },
   ];
@@ -134,6 +182,7 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
       </div>
 
       <DataTable columns={columns} rows={filtered} loading={loading}
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         actions={row=><>
           <button
             className="p-1.5 hover:text-primary transition-colors material-symbols-outlined text-[18px]"
@@ -184,6 +233,7 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Proposal No <span className="text-error">*</span></label>
             <input
+              autoFocus
               className={`w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-body-md text-sm ${
                 errors.proposal_no ? 'border-error focus:border-error' : ''
               }`}
@@ -204,6 +254,24 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
               onChange={e=>set('holder_name',e.target.value)}
             />
             {errors.holder_name&&<span className="text-[11px] text-error font-semibold mt-0.5">{errors.holder_name}</span>}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Contact No 1</label>
+            <input
+              className="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-body-md text-sm"
+              placeholder="+92 XXX XXXXXXX"
+              value={modal.data.contact_1 || ''}
+              onChange={e=>set('contact_1',e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Contact No 2</label>
+            <input
+              className="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-body-md text-sm"
+              placeholder="+92 XXX XXXXXXX"
+              value={modal.data.contact_2 || ''}
+              onChange={e=>set('contact_2',e.target.value)}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Amount / Premium (PKR) <span className="text-error">*</span></label>
@@ -249,15 +317,15 @@ export default function ProposerRegister({ onNavigate, searchFilter, clearSearch
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SR</label>
-            <SearchableDropdown id="prop-sr" options={srOpts} value={modal.data.sr_id} onChange={v=>set('sr_id',v)} placeholder="Select SR…"/>
+            <SearchableDropdown id="prop-sr" options={srOpts} value={modal.data.sr_id} onChange={handleSRChange} placeholder="Select SR…"/>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SM</label>
-            <SearchableDropdown id="prop-sm" options={smOpts} value={modal.data.sm_id} onChange={v=>set('sm_id',v)} placeholder="Select SM…"/>
+            <SearchableDropdown id="prop-sm" options={smOpts} value={modal.data.sm_id} onChange={handleSMChange} placeholder="Select SM…"/>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Assigned SSM</label>
-            <SearchableDropdown id="prop-ssm" options={ssmOpts} value={modal.data.ssm_id} onChange={v=>set('ssm_id',v)} placeholder="Select SSM…"/>
+            <SearchableDropdown id="prop-ssm" options={ssmOpts} value={modal.data.ssm_id} onChange={handleSSMChange} placeholder="Select SSM…"/>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">Status</label>

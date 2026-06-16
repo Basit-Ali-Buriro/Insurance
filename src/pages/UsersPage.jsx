@@ -4,7 +4,7 @@ import Modal, { ConfirmDialog } from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const EMPTY = { name:'', username:'', password:'', role:'admin', status:'active' };
+const EMPTY = { name:'', username:'', contact_email:'', contact_number:'', password:'', role:'admin', status:'active' };
 
 export default function UsersPage({ user: currentUser }) {
   const toast = useToast();
@@ -29,6 +29,9 @@ export default function UsersPage({ user: currentUser }) {
     const e = {};
     if (!d.name.trim())     e.name     = 'Required';
     if (!d.username.trim()) e.username = 'Required';
+    if (d.contact_email && d.contact_email.trim() && !/\S+@\S+\.\S+/.test(d.contact_email)) {
+      e.contact_email = 'Invalid email address';
+    }
     if (mode==='create' && !d.password) e.password = 'Required';
     if (d.password && d.password.length < 6) e.password = 'Min 6 characters';
     return e;
@@ -58,12 +61,13 @@ export default function UsersPage({ user: currentUser }) {
   };
 
   const columns = [
-    { key:'user_id',   label:'ID' },
-    { key:'name',      label:'Name' },
-    { key:'username',  label:'Username' },
-    { key:'role',      label:'Role',   render: v=><span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${v==='developer'?'bg-purple-500/10 text-purple-400 border border-purple-500/20':'bg-primary/10 text-primary border border-primary/20'}`}>{v}</span> },
-    { key:'status',    label:'Status', render: v=><span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${v==='active'?'bg-success/10 text-success':'bg-surface-variant/40 text-outline'}`}><span className={`w-1.5 h-1.5 rounded-full ${v==='active'?'bg-success':'bg-outline'}`}></span>{v}</span> },
-    { key:'created_at',label:'Created' },
+    { key:'user_id',        label:'ID' },
+    { key:'name',           label:'Display Name' },
+    { key:'username',       label:'Username' },
+    { key:'contact_email',  label:'Contact Email', render: v => v || '—' },
+    { key:'contact_number', label:'Contact Number', render: v => v || '—' },
+    { key:'role',           label:'Role',   render: v=><span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${v==='developer'?'bg-purple-500/10 text-purple-400 border border-purple-500/20':'bg-primary/10 text-primary border border-primary/20'}`}>{v}</span> },
+    { key:'status',         label:'Status', render: v=><span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${v==='active'?'bg-success/10 text-success':'bg-surface-variant/40 text-outline'}`}><span className={`w-1.5 h-1.5 rounded-full ${v==='active'?'bg-success':'bg-outline'}`}></span>{v}</span> },
   ];
 
   return (
@@ -123,7 +127,9 @@ export default function UsersPage({ user: currentUser }) {
         <div className="space-y-4 select-none">
           {[
             ['name','Display Name',true,'text', 'Enter full name'],
-            ['username','Username',true,'text', 'Enter unique username']
+            ['username','Username',true,'text', 'Enter unique username'],
+            ['contact_email','Contact Email',false,'email', 'Enter contact email'],
+            ['contact_number','Contact Number',false,'text', 'Enter contact number']
           ].map(([k,label,req,type,placeholder])=>(
             <div key={k} className="flex flex-col gap-1.5">
               <label className="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider block">
@@ -132,6 +138,7 @@ export default function UsersPage({ user: currentUser }) {
               <input
                 type={type}
                 placeholder={placeholder}
+                autoFocus={k === 'name'}
                 className={`w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-outline-variant font-body-md text-sm ${
                   errors[k] ? 'border-error focus:border-error' : ''
                 }`}

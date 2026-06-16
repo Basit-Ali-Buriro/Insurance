@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../lib/api.js';
+import logo from '../../assets/logo.svg';
 
 const PAGES = [
   { key: 'dashboard',        label: 'Dashboard',         icon: 'dashboard' },
@@ -49,40 +50,38 @@ export default function Sidebar({ user, activePage, onNavigate, onLogout, isOpen
           onClick={onClose}
         />
       )}
-      <aside className={`fixed left-0 top-0 h-full bg-surface-container border-r border-border-subtle flex flex-col py-stack-lg z-50 overflow-y-auto select-none transition-all duration-300 ease-in-out md:translate-x-0 ${
+      <aside className={`fixed left-0 top-0 h-full bg-surface-container border-r border-border-subtle flex flex-col py-6 z-50 overflow-y-auto select-none transition-all duration-300 ease-in-out md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } ${
         isCollapsed ? 'w-[80px]' : 'w-[260px]'
       }`}>
         {/* Brand Logo */}
-        <div className={`mb-8 flex items-center justify-center ${isCollapsed ? 'px-2' : 'px-6 gap-3'}`}>
-          <div className="w-10 h-10 rounded-lg bg-primary-container/10 border border-primary/20 flex items-center justify-center text-primary text-[24px] shrink-0">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>shield_lock</span>
-          </div>
+        <div className={`mb-6 flex items-center justify-center ${isCollapsed ? 'px-2' : 'px-6 gap-4'}`}>
+          <img src={logo} alt="Nexus Insure Logo" className={`${isCollapsed ? 'w-10 h-10' : 'w-14 h-14'} object-contain rounded-lg shrink-0`} />
           {!isCollapsed && (
-            <div className="truncate">
-              <h1 className="font-headline-md text-sm font-bold text-on-surface leading-tight">Sentinel Insure</h1>
-              <p className="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-75">Records ERP</p>
+            <div className="truncate flex-1">
+              <h1 className="text-base font-bold text-on-surface leading-tight tracking-wider font-['Outfit']">Lalwani</h1>
+              <p className="text-[9px] uppercase tracking-[0.15em] text-on-surface-variant opacity-75 font-semibold">Software Solutions</p>
             </div>
           )}
         </div>
 
-        {/* Profile info */}
+        {/* User Session Block */}
         {user && !isCollapsed && (
-          <div className="px-6 py-3 mb-6 border-y border-border-subtle bg-surface-container-low/30">
-            <div className="text-xs text-outline uppercase font-semibold tracking-wide">Terminal Session</div>
-            <div className="text-sm font-bold text-on-surface mt-1 truncate">{user.name}</div>
-            <span className={`inline-block px-2 py-0.5 mt-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-              user.role === 'developer' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-primary/10 text-primary border border-primary/20'
-            }`}>
-              {user.role}
-            </span>
+          <div className="mx-4 p-3 mb-6 bg-surface-deep border border-outline-variant/30 rounded-lg flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-electric-blue flex items-center justify-center font-bold text-white uppercase text-sm shrink-0">
+              {user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+            </div>
+            <div className="truncate text-left select-none">
+              <span className="font-label-lg text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block">{user.role === 'developer' ? 'Super Admin' : 'Agent Admin'}</span>
+              <span className="font-body-sm text-sm text-on-surface font-semibold truncate block mt-0.5">{user.name}</span>
+            </div>
           </div>
         )}
         {user && isCollapsed && (
-          <div className="px-2 py-3 mb-6 flex justify-center border-y border-border-subtle bg-surface-container-low/30">
+          <div className="px-2 py-3 mb-6 flex justify-center border-y border-border-subtle bg-surface-deep/30">
             <div 
-              className="h-8 w-8 rounded-full bg-primary-container/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs select-none"
+              className="h-8 w-8 rounded-full bg-electric-blue/10 border border-electric-blue/20 flex items-center justify-center text-electric-blue font-bold text-xs select-none"
               title={`Active Session: ${user.name} (${user.role})`}
             >
               {user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
@@ -91,19 +90,19 @@ export default function Sidebar({ user, activePage, onNavigate, onLogout, isOpen
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3">
+        <nav className="flex-grow space-y-0.5 px-3">
           {visiblePages.map(p => {
             const isActive = activePage === p.key;
             return (
               <button
                 key={p.key}
                 id={`nav-${p.key}`}
-                className={`w-full flex items-center rounded-lg text-body-md transition-all group outline-none relative ${
+                className={`w-full flex items-center rounded-lg text-body-md transition-all duration-150 group outline-none relative ${
                   isCollapsed ? 'justify-center py-3 px-2' : 'gap-3 px-4 py-2.5'
                 } ${
                   isActive
-                    ? 'text-primary font-bold border-r-2 border-primary bg-surface-variant/30 shadow-sm'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest'
+                    ? 'text-on-surface font-bold border-l-4 border-electric-blue bg-surface-deep translate-x-0.5'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
                 }`}
                 onClick={() => {
                   onNavigate(p.key);
@@ -112,13 +111,13 @@ export default function Sidebar({ user, activePage, onNavigate, onLogout, isOpen
                 title={p.label}
               >
                 <span className={`material-symbols-outlined text-[20px] transition-colors ${
-                  isActive ? 'text-primary' : 'text-outline group-hover:text-on-surface'
+                  isActive ? 'text-electric-blue' : 'text-outline group-hover:text-on-surface'
                 }`}>
                   {p.icon}
                 </span>
-                {!isCollapsed && <span className="font-body-md text-left flex-1 truncate">{p.label}</span>}
+                {!isCollapsed && <span className="font-label-lg text-label-lg text-left flex-1 truncate">{p.label}</span>}
                 {!isCollapsed && p.key === 'notifications' && notifCount > 0 && (
-                  <span className="bg-error text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  <span className="bg-error text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
                     {notifCount > 99 ? '99+' : notifCount}
                   </span>
                 )}
@@ -133,9 +132,9 @@ export default function Sidebar({ user, activePage, onNavigate, onLogout, isOpen
         </nav>
 
         {/* Logout */}
-        <div className="px-2 mt-auto pt-4 border-t border-border-subtle">
+        <div className="px-3 mt-auto pt-4 border-t border-border-subtle">
           <button
-            className={`w-full flex items-center justify-center rounded-lg text-body-md font-bold text-error bg-error/5 hover:bg-error/15 active:scale-[0.98] transition-all ${
+            className={`w-full flex items-center justify-center rounded-lg text-body-md font-bold text-crimson-red bg-crimson-red/5 hover:bg-crimson-red/15 active:scale-[0.98] transition-all duration-150 ${
               isCollapsed ? 'py-3' : 'gap-2 px-4 py-3'
             }`}
             id="btn-logout"
@@ -146,8 +145,14 @@ export default function Sidebar({ user, activePage, onNavigate, onLogout, isOpen
             {!isCollapsed && <span>Log Out</span>}
           </button>
         </div>
+
+        {/* Copyright */}
+        {!isCollapsed && (
+          <div className="px-4 py-3 text-center text-[8px] text-on-surface-variant/40 uppercase tracking-wider font-bold select-none leading-normal shrink-0">
+            © 2026 Lalwani Software Solutions.
+          </div>
+        )}
       </aside>
     </>
   );
 }
-

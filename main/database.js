@@ -21,6 +21,18 @@ function getDb() {
   return _db;
 }
 
+function closeDb() {
+  if (_db) {
+    try {
+      _db.close();
+      getLogger().info('Database connection closed');
+    } catch (err) {
+      getLogger().error(`Error closing database: ${err.message}`);
+    }
+    _db = null;
+  }
+}
+
 /* ───────────────────────────── SCHEMA ───────────────────────────── */
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS Users (
@@ -30,19 +42,23 @@ const SCHEMA = `
     password_hash TEXT NOT NULL,
     role          TEXT CHECK(role IN ('developer','admin')) NOT NULL,
     status        TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
+    contact       TEXT,
+    contact_email TEXT,
+    contact_number TEXT,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS Area_Managers (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    am_code    TEXT UNIQUE NOT NULL,
-    am_name    TEXT NOT NULL,
-    address    TEXT,
-    cnic       TEXT NOT NULL,
-    contact_1  TEXT,
-    contact_2  TEXT,
-    status     TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    am_code      TEXT UNIQUE NOT NULL,
+    am_name      TEXT NOT NULL,
+    address      TEXT,
+    cnic         TEXT NOT NULL,
+    contact_1    TEXT,
+    contact_2    TEXT,
+    status       TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
+    license_date DATE,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS SSM (
@@ -61,6 +77,7 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
+    license_date        DATE,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -81,6 +98,7 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
+    license_date        DATE,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -102,6 +120,7 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
+    license_date        DATE,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -119,6 +138,8 @@ const SCHEMA = `
     ssm_id              INTEGER REFERENCES SSM(id),
     status              TEXT CHECK(status IN ('ok','not_ok')) DEFAULT 'not_ok',
     converted_to_policy INTEGER DEFAULT 0,
+    contact_1           TEXT,
+    contact_2           TEXT,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -271,6 +292,47 @@ function initializeDatabase() {
 
   db.exec(SCHEMA);
 
+  // Schema alterations to support license_date for existing databases
+  const tables = ['Area_Managers', 'SSM', 'SM', 'SR'];
+  for (const table of tables) {
+    try {
+      db.prepare(`ALTER TABLE ${table} ADD COLUMN license_date DATE`).run();
+      log.info(`Added license_date column to ${table} table`);
+    } catch (err) {
+      if (err.message.includes('duplicate column name') || err.message.includes('already exists')) {
+        // column already exists, safe to ignore
+      } else {
+        log.error(`Error migrating table ${table} for license_date: ${err.message}`);
+      }
+    }
+  }
+
+  // Migrations for Proposer_Register contact columns
+  try {
+    db.prepare('ALTER TABLE Proposer_Register ADD COLUMN contact_1 TEXT').run();
+    log.info('Added contact_1 column to Proposer_Register table');
+  } catch (err) {}
+  try {
+    db.prepare('ALTER TABLE Proposer_Register ADD COLUMN contact_2 TEXT').run();
+    log.info('Added contact_2 column to Proposer_Register table');
+  } catch (err) {}
+
+  // Migrations for Users contact column
+  try {
+    db.prepare('ALTER TABLE Users ADD COLUMN contact TEXT').run();
+    log.info('Added contact column to Users table');
+  } catch (err) {}
+
+  try {
+    db.prepare('ALTER TABLE Users ADD COLUMN contact_email TEXT').run();
+    log.info('Added contact_email column to Users table');
+  } catch (err) {}
+
+  try {
+    db.prepare('ALTER TABLE Users ADD COLUMN contact_number TEXT').run();
+    log.info('Added contact_number column to Users table');
+  } catch (err) {}
+
   // Config defaults
   const upsertConfig = db.prepare(`INSERT OR IGNORE INTO Config (key, value) VALUES (?, ?)`);
   upsertConfig.run('monthly_target',  '0');
@@ -284,11 +346,11 @@ function initializeDatabase() {
     const adminHash = bcrypt.hashSync('Admin@1234', 10);
 
     const insUser = db.prepare(`
-      INSERT INTO Users (name, username, password_hash, role, status)
-      VALUES (?, ?, ?, ?, 'active')
+      INSERT INTO Users (name, username, password_hash, role, status, contact_email, contact_number)
+      VALUES (?, ?, ?, ?, 'active', ?, ?)
     `);
-    insUser.run(encrypt('Super Administrator'), encrypt('developer'), devHash,   'developer');
-    insUser.run(encrypt('Admin User'),          encrypt('admin'),     adminHash, 'admin');
+    insUser.run(encrypt('Super Administrator'), encrypt('developer'), devHash,   'developer', encrypt(''), encrypt(''));
+    insUser.run(encrypt('Admin User'),          encrypt('admin'),     adminHash, 'admin',     encrypt(''), encrypt(''));
 
     db.transaction(seedSampleData)(db);
     log.info('Database seeded with initial users and sample data');
@@ -307,4 +369,4 @@ function decryptRow(row, fields) {
   return out;
 }
 
-module.exports = { getDb, initializeDatabase, decryptRow, seedSampleData };
+module.exports = { getDb, initializeDatabase, decryptRow, seedSampleData, closeDb };

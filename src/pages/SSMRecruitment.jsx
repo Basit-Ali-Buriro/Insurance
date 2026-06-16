@@ -18,7 +18,8 @@ const EMPTY = {
   nominee_cnic_pic: '',
   matric_cert: '',
   intermediate_cert: '',
-  degree_cert: ''
+  degree_cert: '',
+  license_date: ''
 };
 
 function FileAttachmentInput({ label, value, fieldName, code, onChange }) {
@@ -166,10 +167,13 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
   };
 
   const columns = [
+    { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'ssm_code', label: 'SSM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'ssm_name', label: 'SSM Name' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'contact_1', label: 'Contact', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
+    { key: 'address', label: 'Address' },
     { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
     { 
       key: 'status', 
@@ -181,6 +185,11 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
           {v}
         </span>
       ) 
+    },
+    { 
+      key: 'license_date', 
+      label: 'License Date', 
+      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
     },
     { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
@@ -227,6 +236,7 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
         columns={columns} 
         rows={filtered} 
         loading={loading}
+        highlightId={new URLSearchParams(window.location.search).get('highlight')}
         actions={row => (
           <div className="flex items-center gap-2">
             <button
@@ -281,6 +291,7 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
             <div className="form-group">
               <label className="form-label required">SSM Code</label>
               <input 
+                autoFocus
                 className={`bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full ${errors.ssm_code ? 'border-error' : ''}`}
                 value={modal.data.ssm_code || ''} 
                 onChange={e => set('ssm_code', e.target.value)} 
@@ -340,12 +351,22 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-group">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="form-group col-span-2">
               <label className="form-label">Area Manager</label>
               <div className="relative">
                 <SearchableDropdown id="ssm-am" options={amOpts} value={modal.data.am_id} onChange={v => set('am_id', v)} placeholder="Select Area Manager…" />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">License Date</label>
+              <input 
+                type="date"
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.license_date || ''} 
+                onChange={e => set('license_date', e.target.value)} 
+              />
             </div>
           </div>
 
