@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #051424;
+            color: #d4e4fa;
+            margin: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "warning": "#f59e0b",
+                        "surface-variant": "#273647",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#00285d",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-primary-fixed": "#001a42",
+                        "on-secondary": "#283044",
+                        "on-primary": "#002e6a",
+                        "on-primary-fixed-variant": "#004395",
+                        "secondary": "#bec6e0",
+                        "surface-bright": "#1e293b",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#1f2a3c",
+                        "surface-container-low": "#0d1c2d",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary-container": "#4d8eff",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#d8e3fb",
+                        "surface": "#051424",
+                        "on-tertiary": "#263143",
+                        "on-error": "#690005",
+                        "background": "#051424",
+                        "error": "#ef4444",
+                        "on-secondary-container": "#adb4ce",
+                        "secondary-container": "#3f465c",
+                        "surface-tint": "#adc6ff",
+                        "surface-container-high": "#1c2b3c",
+                        "tertiary": "#bcc7de",
+                        "success": "#10b981",
+                        "surface-dim": "#051424",
+                        "primary": "#adc6ff",
+                        "on-surface": "#d4e4fa",
+                        "border-subtle": "#334155",
+                        "inverse-on-surface": "#233143",
+                        "on-secondary-fixed": "#131b2e",
+                        "tertiary-fixed-dim": "#bcc7de",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "secondary-fixed": "#dae2fd",
+                        "outline-variant": "#424754",
+                        "tertiary-container": "#8691a7",
+                        "inverse-primary": "#005ac2",
+                        "on-tertiary-fixed": "#111c2d",
+                        "surface-container-highest": "#273647",
+                        "surface-container": "#122131",
+                        "surface-deep": "#020617",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container-lowest": "#010f1f",
+                        "outline": "#8c909f",
+                        "on-background": "#d4e4fa",
+                        "inverse-surface": "#d4e4fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "2rem",
+                        "container-max": "1440px",
+                        "stack-sm": "0.5rem",
+                        "section-padding": "2.5rem",
+                        "stack-md": "1rem",
+                        "sidebar-width": "260px",
+                        "gutter": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "mono-data": ["Inter"],
+                        "display-kpi": ["Inter"],
+                        "table-header": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-deep text-on-surface min-h-screen">
+<!-- Fixed SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-full w-[260px] bg-secondary dark:bg-surface-container flex flex-col py-stack-lg border-r border-border-subtle z-50">
+<div class="px-6 mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-on-secondary dark:text-on-secondary-fixed">SecureInsure</h1>
+<p class="text-xs uppercase tracking-widest text-on-secondary-container opacity-70">Records Management</p>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Registers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-container-highest font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined">person_cancel</span>
+<span>Users</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary text-on-primary-container font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Policy
+            </button>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 right-0 left-[260px] h-16 flex justify-between items-center px-gutter bg-surface-container-low border-b border-border-subtle z-40">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">Records Portal</span>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg py-1.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-0 outline-none transition-all" placeholder="Global search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-outline">
+<button class="hover:text-primary transition-colors scale-95 active:scale-100"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-primary transition-colors scale-95 active:scale-100"><span class="material-symbols-outlined">security</span></button>
+<button class="hover:text-primary transition-colors scale-95 active:scale-100"><span class="material-symbols-outlined">help</span></button>
+</div>
+<div class="h-8 w-[1px] bg-border-subtle"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Admin User</p>
+<p class="text-[10px] text-outline uppercase tracking-tighter">System Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border border-border-subtle object-cover" data-alt="A professional studio portrait of a corporate executive for a technology firm. The lighting is sophisticated and directional, casting subtle shadows that emphasize authority and focus. The background is a dark, muted slate grey, complementing the professional aesthetic of an enterprise software administrator profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu6uCZ-rWjq8DTNrlu4G-HnQgavbZ6aOF_IPhZSixcLQCtHUY67vNSbJPksRI763AKk51-Utb68Bz_J_FLw__zJnlg4cZyJY3LZf_rc4jwi6MKp_lWpWxt1rGkVVXlLs_U3v-x6ONruVI8nGqEW9oO21hfw0E9UsFidGTQwFhHQRtqKxuqk-drDztueJgmMgLNSp4nTgU1o-rJom62x0wlKSk96pbMxXh5Y_Wgka-YWCbMP2aacXhKaI9eMx78QPLh_BtcSJU_cFs"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] pt-16 min-h-screen p-8">
+<div class="max-w-[1440px] mx-auto space-y-stack-lg">
+<!-- Page Header -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Account Settings</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Manage your secure identity, security protocols, and platform preferences.</p>
+</section>
+<!-- Bento Grid Layout for Settings Sections -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Profile Management Card (Col 8) -->
+<div class="lg:col-span-8 bg-surface-bright border border-border-subtle rounded-xl overflow-hidden flex flex-col">
+<div class="h-12 px-gutter flex items-center justify-between border-b border-border-subtle bg-surface-container-high/50">
+<span class="font-label-caps text-label-caps text-primary uppercase">Profile Management</span>
+<span class="material-symbols-outlined text-outline text-sm">badge</span>
+</div>
+<div class="p-8 flex flex-col md:flex-row gap-10">
+<!-- Avatar Section -->
+<div class="flex flex-col items-center gap-4">
+<div class="relative group">
+<img class="w-32 h-32 rounded-full object-cover border-4 border-surface-container-highest" data-alt="A detailed, close-up photograph of a professional administrator for an insurance records system. The subject is well-lit with soft, cool-toned studio lights. The aesthetic is clean, corporate, and trustworthy, with high-definition clarity that fits a modern dark-themed dashboard interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO-6ChccgDwYzHqLNwydwpeM_mHzNr0BXZ2XCToM63f6hkWEZUipwtpVOzC8gM0Gd8zT4FfPYgsOk1mODgoxUjgIGhdXh0GTrGJ2j2KER6s1NXBpqrSO8F2XI_uNYvL8SGnRX9rQVk5VaWQV7Y4lx4lHH82OzgtcJd-oKlgDhQB16vgQTZCeowqY9I-1pxZxWTgnHEi2IfYbzo5sWVRULcX4P5ghbUQu8r1XXnNfFxNDd_FT7BkvqTcvYXwbue8CNXKWkf-zYqmQM"/>
+<button class="absolute bottom-0 right-0 p-2 bg-primary text-on-primary-container rounded-full shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">photo_camera</span>
+</button>
+</div>
+<p class="text-xs text-outline font-label-caps">JPG or PNG. Max 2MB.</p>
+</div>
+<!-- Form Section -->
+<div class="flex-1 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Display Name</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2.5 text-body-md focus:border-primary focus:ring-0 outline-none transition-all" type="text" value="Alexander Vance"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Username</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2.5 text-body-md focus:border-primary focus:ring-0 outline-none transition-all" type="text" value="avance_admin"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Email Address</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2.5 text-body-md focus:border-primary focus:ring-0 outline-none transition-all opacity-70" readonly="" type="email" value="alexander.vance@secureinsure.com"/>
+<p class="text-[11px] text-outline italic">Contact system administrator to change your linked email.</p>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Professional Bio</label>
+<textarea class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2.5 text-body-md focus:border-primary focus:ring-0 outline-none transition-all resize-none" rows="3">Senior Compliance Lead specializing in risk mitigation and lifecycle management for enterprise insurance records.</textarea>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low border-t border-border-subtle flex justify-end gap-3">
+<button class="px-6 py-2 border border-border-subtle text-on-surface rounded-lg font-body-md text-body-md hover:bg-surface-container-high transition-colors">Discard</button>
+<button class="px-6 py-2 bg-primary text-on-primary-container font-bold rounded-lg font-body-md text-body-md hover:opacity-90 transition-opacity">Save Changes</button>
+</div>
+</div>
+<!-- Security Card (Col 4) -->
+<div class="lg:col-span-4 bg-surface-bright border border-border-subtle rounded-xl flex flex-col">
+<div class="h-12 px-gutter flex items-center justify-between border-b border-border-subtle bg-surface-container-high/50">
+<span class="font-label-caps text-label-caps text-primary uppercase">Security Configuration</span>
+<span class="material-symbols-outlined text-outline text-sm">lock</span>
+</div>
+<div class="p-6 flex-1 space-y-6">
+<div class="space-y-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Change Password</h3>
+<div class="space-y-4">
+<div class="space-y-1.5">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Current Password</label>
+<div class="relative">
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2 text-body-md focus:border-primary focus:ring-0 outline-none transition-all" type="password"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-sm cursor-pointer">visibility</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-caps text-label-caps text-on-surface-variant">New Password</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2 text-body-md focus:border-primary focus:ring-0 outline-none transition-all" type="password"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Confirm New Password</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2 text-body-md focus:border-primary focus:ring-0 outline-none transition-all" type="password"/>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-highest text-primary border border-primary/20 font-bold rounded-lg font-body-md text-body-md hover:bg-primary/10 transition-colors">
+                                Update Password
+                            </button>
+</div>
+<hr class="border-border-subtle"/>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">Two-Factor Auth</span>
+<span class="text-[11px] text-success">Enabled (SMS)</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between opacity-50">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">Login Notifications</span>
+<span class="text-[11px] text-outline">Push &amp; Email</span>
+</div>
+<label class="relative inline-flex items-center cursor-not-allowed">
+<input class="sr-only peer" disabled="" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- System Preferences (Col 12) -->
+<div class="lg:col-span-12 bg-surface-bright border border-border-subtle rounded-xl flex flex-col">
+<div class="h-12 px-gutter flex items-center justify-between border-b border-border-subtle bg-surface-container-high/50">
+<span class="font-label-caps text-label-caps text-primary uppercase">System Preferences</span>
+<span class="material-symbols-outlined text-outline text-sm">settings_suggest</span>
+</div>
+<div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Appearance -->
+<div class="space-y-6">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">dark_mode</span> Appearance
+                            </h4>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col gap-2 p-3 rounded-lg border-2 border-primary bg-surface-container-highest">
+<div class="w-full aspect-video bg-surface-deep rounded-md border border-border-subtle overflow-hidden p-1">
+<div class="w-full h-full bg-surface-container-high rounded-sm"></div>
+</div>
+<span class="text-xs font-bold text-center">Sentinel Dark</span>
+</button>
+<button class="flex flex-col gap-2 p-3 rounded-lg border border-border-subtle hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-video bg-white rounded-md border border-gray-200 overflow-hidden p-1">
+<div class="w-full h-full bg-gray-100 rounded-sm"></div>
+</div>
+<span class="text-xs font-bold text-center text-outline">Arctic Light</span>
+</button>
+</div>
+</div>
+<!-- Regional & Format -->
+<div class="space-y-6">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">language</span> Language &amp; Region
+                            </h4>
+<div class="space-y-4">
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-outline">Language Interface</label>
+<select class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2 text-sm focus:border-primary focus:ring-0 outline-none">
+<option>English (United States)</option>
+<option>German (DACH)</option>
+<option>Spanish (Latin America)</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase font-bold text-outline">Time Zone</label>
+<select class="w-full bg-surface-deep border border-border-subtle rounded-lg px-4 py-2 text-sm focus:border-primary focus:ring-0 outline-none">
+<option>(GMT-05:00) Eastern Time</option>
+<option>(GMT+00:00) UTC</option>
+<option>(GMT+01:00) Central European Time</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Data & Notifications -->
+<div class="space-y-6">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">database</span> Data Management
+                            </h4>
+<div class="space-y-3">
+<button class="w-full flex items-center justify-between p-4 rounded-lg bg-surface-deep border border-border-subtle hover:bg-surface-container-high transition-colors group">
+<div class="text-left">
+<p class="text-sm font-bold">Export Personal Audit Log</p>
+<p class="text-[11px] text-outline">CSV format, includes last 90 days</p>
+</div>
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">download</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 rounded-lg bg-surface-deep border border-border-subtle hover:bg-surface-container-high transition-colors group">
+<div class="text-left">
+<p class="text-sm font-bold">Clear Cache &amp; Session</p>
+<p class="text-[11px] text-outline">Ends all other active sessions</p>
+</div>
+<span class="material-symbols-outlined group-hover:text-error transition-colors">logout</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Danger Zone -->
+<section class="mt-12 bg-error-container/10 border border-error/20 rounded-xl p-8">
+<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="space-y-1">
+<h4 class="text-error font-bold font-body-lg text-body-lg">Danger Zone</h4>
+<p class="text-on-error-container/80 text-sm">Permanently deactivate your administrator account. This action cannot be undone and will revoke all access instantly.</p>
+</div>
+<button class="px-6 py-3 border-2 border-error text-error font-bold rounded-lg hover:bg-error hover:text-white transition-all">
+                        Deactivate Account
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Placeholder for future interaction logic (toggles, input masks)
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+
+        // Simple visibility toggle for password
+        const togglePass = document.querySelector('.material-symbols-outlined.cursor-pointer');
+        if(togglePass) {
+            togglePass.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if(input.type === 'password') {
+                    input.type = 'text';
+                    this.textContent = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    this.textContent = 'visibility';
+                }
+            });
+        }
+    </script>
+</body></html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "warning": "#f59e0b",
+                "surface-variant": "#273647",
+                "primary-fixed": "#d8e2ff",
+                "error-container": "#93000a",
+                "on-primary-container": "#00285d",
+                "secondary-fixed-dim": "#bec6e0",
+                "on-primary-fixed": "#001a42",
+                "on-secondary": "#283044",
+                "on-primary": "#002e6a",
+                "on-primary-fixed-variant": "#004395",
+                "secondary": "#bec6e0",
+                "surface-bright": "#1e293b",
+                "on-error-container": "#ffdad6",
+                "on-tertiary-container": "#1f2a3c",
+                "surface-container-low": "#0d1c2d",
+                "primary-fixed-dim": "#adc6ff",
+                "primary-container": "#4d8eff",
+                "on-secondary-fixed-variant": "#3f465c",
+                "tertiary-fixed": "#d8e3fb",
+                "surface": "#051424",
+                "on-tertiary": "#263143",
+                "on-error": "#690005",
+                "background": "#051424",
+                "error": "#ef4444",
+                "on-secondary-container": "#adb4ce",
+                "secondary-container": "#3f465c",
+                "surface-tint": "#adc6ff",
+                "surface-container-high": "#1c2b3c",
+                "tertiary": "#bcc7de",
+                "success": "#10b981",
+                "surface-dim": "#051424",
+                "primary": "#adc6ff",
+                "on-surface": "#d4e4fa",
+                "border-subtle": "#334155",
+                "inverse-on-surface": "#233143",
+                "on-secondary-fixed": "#131b2e",
+                "tertiary-fixed-dim": "#bcc7de",
+                "on-tertiary-fixed-variant": "#3c475a",
+                "secondary-fixed": "#dae2fd",
+                "outline-variant": "#424754",
+                "tertiary-container": "#8691a7",
+                "inverse-primary": "#005ac2",
+                "on-tertiary-fixed": "#111c2d",
+                "surface-container-highest": "#273647",
+                "surface-container": "#122131",
+                "surface-deep": "#020617",
+                "on-surface-variant": "#c2c6d6",
+                "surface-container-lowest": "#010f1f",
+                "outline": "#8c909f",
+                "on-background": "#d4e4fa",
+                "inverse-surface": "#d4e4fa"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "stack-lg": "2rem",
+                "container-max": "1440px",
+                "stack-sm": "0.5rem",
+                "section-padding": "2.5rem",
+                "stack-md": "1rem",
+                "sidebar-width": "260px",
+                "gutter": "1.5rem"
+            },
+            "fontFamily": {
+                "label-caps": ["Inter"],
+                "mono-data": ["Inter"],
+                "display-kpi": ["Inter"],
+                "table-header": ["Inter"],
+                "body-lg": ["Inter"],
+                "headline-md": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-lg": ["Inter"],
+                "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                "display-kpi": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "table-header": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #020617;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #051424;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+        .modal-backdrop {
+            background-color: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-surface-deep text-on-surface">
+<!-- Side Navigation Bar -->
+<nav class="fixed left-0 top-0 h-full w-[260px] bg-secondary dark:bg-secondary border-r border-border-subtle flex flex-col py-stack-lg z-50">
+<div class="px-gutter mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-on-secondary dark:text-on-secondary-fixed">SecureInsure</h1>
+<p class="font-body-md text-body-md text-on-secondary-fixed-variant opacity-70">Records Management</p>
+</div>
+<div class="flex-1 space-y-1 px-4">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- Registers -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-md text-body-md">Registers</span>
+</a>
+<!-- Team -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-body-md text-body-md">Team</span>
+</a>
+<!-- Reports -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-secondary-container dark:text-on-secondary-fixed-variant hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<!-- Users (ACTIVE) -->
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-2 border-primary bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="person_manage">person_cancel</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+</div>
+<div class="px-gutter mt-auto">
+<button class="w-full bg-primary text-on-primary font-bold py-3 px-4 rounded transition-transform scale-95 active:scale-100 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                New Policy
+            </button>
+</div>
+</nav>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 h-16 bg-secondary dark:bg-secondary border-b border-border-subtle z-40 ml-[260px] flex justify-between items-center px-gutter">
+<div class="flex items-center gap-8">
+<h2 class="font-headline-md text-headline-md font-bold text-on-secondary dark:text-on-secondary-fixed">Records Portal</h2>
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-secondary-fixed-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-deep border-none focus:ring-1 focus:ring-primary rounded-lg py-2 pl-10 text-body-md text-on-surface" placeholder="Search accounts or system logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+</button>
+<button class="text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-border-subtle"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-on-secondary dark:text-on-secondary-fixed leading-none">Admin Root</p>
+<p class="text-[11px] text-primary">System Developer</p>
+</div>
+<img alt="Administrator Profile" class="w-10 h-10 rounded-full border border-border-subtle object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBopsuTvt3zyUMuSWSx-qYspiabx84XrC4lk6zrRMSOCk999ZV5poCf0mLYswj5ESa6MFJDdCcVEMs-08Dq-GKMB64QIPKVWgExs37FN0bheZJ_CDmXgCCZqKUz27jK1ZYYAlyCFIDt90dOVY7OyE56s-h67aKFUSXREVf6R7rvJyFIzzNNYqmDsZVkn4rv3vgYQClkBZoK-qt5_aBHmDLIWTDbd71iv1oizzhQSFAlYgppgeTjbk-pb4ta5ckcZZrR_HaEOz49CXw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[260px] pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-gutter">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-stack-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">User Management</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">System-level administration for application access and privileges.</p>
+</div>
+<div class="flex gap-stack-sm">
+<button class="bg-surface-bright border border-border-subtle hover:bg-surface-variant px-stack-md py-2 flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="download">download</span>
+<span class="font-label-caps text-label-caps">Export Audit CSV</span>
+</button>
+<button class="bg-primary text-on-primary px-stack-md py-2 flex items-center gap-2 hover:brightness-110 transition-all font-bold rounded" onclick="toggleModal('add-user-modal')">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
+                        Add New User
+                    </button>
+</div>
+</div>
+<!-- Dashboard KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-md mb-stack-lg">
+<div class="bg-surface-bright border border-border-subtle p-stack-md rounded">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">Total Users</p>
+<div class="flex items-end gap-2">
+<p class="font-display-kpi text-display-kpi">1,284</p>
+<span class="text-success text-[12px] mb-2">+4%</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border-subtle p-stack-md rounded">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">Active Accounts</p>
+<div class="flex items-end gap-2">
+<p class="font-display-kpi text-display-kpi">1,102</p>
+<span class="text-on-surface-variant text-[12px] mb-2">85.8%</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border-subtle p-stack-md rounded">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">Login Success Rate</p>
+<div class="flex items-end gap-2">
+<p class="font-display-kpi text-display-kpi">99.8%</p>
+<span class="material-symbols-outlined text-success mb-2" data-icon="bolt">bolt</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border-subtle p-stack-md rounded">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">Security Flags</p>
+<div class="flex items-end gap-2">
+<p class="font-display-kpi text-display-kpi">0</p>
+<span class="text-on-surface-variant text-[12px] mb-2">Nominal</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid - Table Container -->
+<div class="bg-surface-bright border border-border-subtle rounded-xl overflow-hidden shadow-2xl">
+<div class="px-gutter py-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-low">
+<div class="flex gap-4 items-center">
+<h3 class="font-table-header text-table-header text-on-surface uppercase tracking-widest">Master User Register</h3>
+<span class="bg-primary-container text-on-primary-container px-2 py-0.5 text-[10px] rounded-full font-bold">LIVE FEED</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined" data-icon="filter_list">filter_list</span></button>
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined" data-icon="refresh">refresh</span></button>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high border-b border-border-subtle">
+<th class="px-gutter py-4 font-table-header text-table-header text-on-surface-variant uppercase">User ID</th>
+<th class="px-gutter py-4 font-table-header text-table-header text-on-surface-variant uppercase">Name</th>
+<th class="px-gutter py-4 font-table-header text-table-header text-on-surface-variant uppercase">Username</th>
+<th class="px-gutter py-4 font-table-header text-table-header text-on-surface-variant uppercase">Status</th>
+<th class="px-gutter py-4 font-table-header text-table-header text-on-surface-variant uppercase text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<!-- User Row 1 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-gutter py-3 font-mono-data text-mono-data text-primary">#USR-99021</td>
+<td class="px-gutter py-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-[12px] text-on-secondary-container">EA</div>
+<span class="font-body-md text-body-md">Erik Andersson</span>
+</div>
+</td>
+<td class="px-gutter py-3 font-body-md text-body-md text-on-surface-variant">e.andersson@secureinsure.com</td>
+<td class="px-gutter py-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> ACTIVE
+                                    </span>
+</td>
+<td class="px-gutter py-3 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-variant rounded text-on-surface-variant" onclick="toggleModal('edit-user-modal')" title="Edit"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-surface-variant rounded text-warning" title="Password Reset"><span class="material-symbols-outlined text-[18px]" data-icon="lock_reset">lock_reset</span></button>
+<button class="p-1.5 hover:bg-error-container/20 rounded text-error" title="Delete"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- User Row 2 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-gutter py-3 font-mono-data text-mono-data text-primary">#USR-99018</td>
+<td class="px-gutter py-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center font-bold text-[12px] text-on-tertiary-container">SL</div>
+<span class="font-body-md text-body-md">Sarah Loftus</span>
+</div>
+</td>
+<td class="px-gutter py-3 font-body-md text-body-md text-on-surface-variant">s.loftus@secureinsure.com</td>
+<td class="px-gutter py-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> ACTIVE
+                                    </span>
+</td>
+<td class="px-gutter py-3 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-variant rounded text-on-surface-variant"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-surface-variant rounded text-warning"><span class="material-symbols-outlined text-[18px]" data-icon="lock_reset">lock_reset</span></button>
+<button class="p-1.5 hover:bg-error-container/20 rounded text-error"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- User Row 3 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-gutter py-3 font-mono-data text-mono-data text-primary">#USR-98442</td>
+<td class="px-gutter py-3">
+<div class="flex items-center gap-3">
+<img alt="Marcus Chen" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM4b9ErNQExEZGWms8q4K7z8WrAUXVlzalrsA0jGmEi3xH7CosV9xloEgOe40weOrL1ic_B-gtTECnpKXkKRtjQ4MkzwFOdtJHGt5KgN0GbDAtUQfy3hMV0FOeLzuxstR5laE5taBnAGNgK2V1iTLLegMtXFIvS3Wbn-dqUDP16rBNrh2vSRLCdWE9pIjIGh6Emmr1YPqHH68C8BxRPgyj6zohK2xQmVCnUBBUcYZ7SKkfHuxXLFPBC8-5aS8keIWJpei6BADxlv4"/>
+<span class="font-body-md text-body-md">Marcus Chen</span>
+</div>
+</td>
+<td class="px-gutter py-3 font-body-md text-body-md text-on-surface-variant">m.chen@secureinsure.com</td>
+<td class="px-gutter py-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[11px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span> INACTIVE
+                                    </span>
+</td>
+<td class="px-gutter py-3 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-variant rounded text-on-surface-variant"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-surface-variant rounded text-warning"><span class="material-symbols-outlined text-[18px]" data-icon="lock_reset">lock_reset</span></button>
+<button class="p-1.5 hover:bg-error-container/20 rounded text-error"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- More placeholder rows -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-gutter py-3 font-mono-data text-mono-data text-primary">#USR-98401</td>
+<td class="px-gutter py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-[12px] text-on-secondary">DB</div><span class="font-body-md text-body-md">David Brooks</span></div></td>
+<td class="px-gutter py-3 font-body-md text-body-md text-on-surface-variant">dbrooks@records.local</td>
+<td class="px-gutter py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> ACTIVE</span></td>
+<td class="px-gutter py-3 text-right"><div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button class="p-1.5 hover:bg-surface-variant rounded text-on-surface-variant"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button><button class="p-1.5 hover:bg-surface-variant rounded text-warning"><span class="material-symbols-outlined text-[18px]" data-icon="lock_reset">lock_reset</span></button><button class="p-1.5 hover:bg-error-container/20 rounded text-error"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button></div></td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-gutter py-3 font-mono-data text-mono-data text-primary">#USR-98334</td>
+<td class="px-gutter py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-[12px] text-on-secondary-fixed">JH</div><span class="font-body-md text-body-md">Juliet Hammond</span></div></td>
+<td class="px-gutter py-3 font-body-md text-body-md text-on-surface-variant">j.hammond@external.io</td>
+<td class="px-gutter py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> ACTIVE</span></td>
+<td class="px-gutter py-3 text-right"><div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button class="p-1.5 hover:bg-surface-variant rounded text-on-surface-variant"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button><button class="p-1.5 hover:bg-surface-variant rounded text-warning"><span class="material-symbols-outlined text-[18px]" data-icon="lock_reset">lock_reset</span></button><button class="p-1.5 hover:bg-error-container/20 rounded text-error"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-gutter py-3 bg-surface-container-low border-t border-border-subtle flex justify-between items-center">
+<p class="font-body-md text-body-md text-on-surface-variant">Showing <span class="font-bold text-on-surface">1 - 5</span> of 1,284 accounts</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-surface-deep border border-border-subtle rounded disabled:opacity-50" disabled=""><span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span></button>
+<button class="px-3 py-1 bg-primary text-on-primary font-bold rounded">1</button>
+<button class="px-3 py-1 bg-surface-deep border border-border-subtle rounded text-on-surface-variant hover:text-on-surface">2</button>
+<button class="px-3 py-1 bg-surface-deep border border-border-subtle rounded text-on-surface-variant hover:text-on-surface">3</button>
+<button class="px-3 py-1 bg-surface-deep border border-border-subtle rounded text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modals -->
+<!-- Add User Modal -->
+<div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop" id="add-user-modal">
+<div class="bg-surface-bright w-full max-w-lg rounded-xl border border-border-subtle shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+<div class="px-gutter py-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-high">
+<h3 class="font-headline-md text-headline-md">Add New Account</h3>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="toggleModal('add-user-modal')"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+</div>
+<div class="p-gutter space-y-stack-md">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">First Name</label>
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" placeholder="John" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Last Name</label>
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" placeholder="Doe" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Email / Username</label>
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" placeholder="j.doe@secureinsure.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Temporary Password</label>
+<div class="relative">
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" type="password" value="********"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">System Role</label>
+<select class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none appearance-none">
+<option>Basic Auditor</option>
+<option>Team Lead</option>
+<option>Security Administrator</option>
+<option>Executive Access</option>
+</select>
+</div>
+</div>
+<div class="px-gutter py-4 bg-surface-container-low border-t border-border-subtle flex justify-end gap-3">
+<button class="px-4 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps" onclick="toggleModal('add-user-modal')">Cancel</button>
+<button class="px-6 py-2 bg-primary text-on-primary font-bold rounded">Create Account</button>
+</div>
+</div>
+</div>
+<!-- Edit User Modal -->
+<div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop" id="edit-user-modal">
+<div class="bg-surface-bright w-full max-w-lg rounded-xl border border-border-subtle shadow-2xl overflow-hidden">
+<div class="px-gutter py-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-high">
+<h3 class="font-headline-md text-headline-md">Edit Account: Erik Andersson</h3>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="toggleModal('edit-user-modal')"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+</div>
+<div class="p-gutter space-y-stack-md">
+<div class="flex items-center gap-4 p-4 bg-surface-container rounded border border-border-subtle">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">EA</div>
+<div>
+<p class="font-body-lg text-body-lg">Account Identity</p>
+<p class="font-mono-data text-mono-data text-primary">ID: #USR-99021</p>
+</div>
+<button class="ml-auto text-primary font-label-caps text-label-caps">Change Photo</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Display Name</label>
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" type="text" value="Erik Andersson"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Status</label>
+<select class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none">
+<option selected="">Active</option>
+<option>Inactive</option>
+<option>Suspended</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Username</label>
+<input class="w-full bg-surface-deep border border-border-subtle focus:border-primary rounded px-3 py-2 outline-none" type="text" value="e.andersson@secureinsure.com"/>
+</div>
+<div class="p-3 bg-warning/10 border border-warning/30 rounded flex gap-3">
+<span class="material-symbols-outlined text-warning" data-icon="info">info</span>
+<p class="text-[12px] text-warning/90">Changing the username will force an immediate logout for this user across all active sessions.</p>
+</div>
+</div>
+<div class="px-gutter py-4 bg-surface-container-low border-t border-border-subtle flex justify-between items-center">
+<button class="text-error font-label-caps text-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span> Delete Account</button>
+<div class="flex gap-3">
+<button class="px-4 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps" onclick="toggleModal('edit-user-modal')">Cancel</button>
+<button class="px-6 py-2 bg-primary text-on-primary font-bold rounded">Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Close modal on click outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-backdrop')) {
+                e.target.classList.add('hidden');
+                e.target.classList.remove('flex');
+            }
+        });
+
+        // Add some atmospheric micro-interactions
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.transform = 'translateX(4px)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body></html>

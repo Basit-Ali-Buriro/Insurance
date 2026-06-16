@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | Sentinel Insure</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#111c2d",
+                      "surface-bright": "#1e293b",
+                      "outline-variant": "#424754",
+                      "surface-variant": "#273647",
+                      "on-surface-variant": "#c2c6d6",
+                      "on-primary-fixed": "#001a42",
+                      "inverse-on-surface": "#233143",
+                      "tertiary-container": "#8691a7",
+                      "error": "#ef4444",
+                      "surface-container-lowest": "#010f1f",
+                      "tertiary-fixed-dim": "#bcc7de",
+                      "on-background": "#d4e4fa",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#d4e4fa",
+                      "primary-fixed-dim": "#adc6ff",
+                      "primary": "#adc6ff",
+                      "surface-container-high": "#1c2b3c",
+                      "on-tertiary": "#263143",
+                      "secondary": "#bec6e0",
+                      "border-subtle": "#334155",
+                      "secondary-fixed": "#dae2fd",
+                      "tertiary-fixed": "#d8e3fb",
+                      "error-container": "#93000a",
+                      "surface-dim": "#051424",
+                      "primary-fixed": "#d8e2ff",
+                      "on-secondary-container": "#adb4ce",
+                      "warning": "#f59e0b",
+                      "surface-container-low": "#0d1c2d",
+                      "inverse-primary": "#005ac2",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "surface-tint": "#adc6ff",
+                      "background": "#051424",
+                      "on-primary": "#002e6a",
+                      "surface": "#051424",
+                      "primary-container": "#4d8eff",
+                      "surface-container-highest": "#273647",
+                      "surface-container": "#122131",
+                      "on-error": "#690005",
+                      "on-tertiary-container": "#1f2a3c",
+                      "on-primary-container": "#00285d",
+                      "tertiary": "#bcc7de",
+                      "surface-deep": "#020617",
+                      "secondary-container": "#3f465c",
+                      "success": "#10b981",
+                      "outline": "#8c909f",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "on-tertiary-fixed-variant": "#3c475a",
+                      "inverse-surface": "#d4e4fa",
+                      "on-secondary-fixed": "#131b2e",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary": "#283044"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-sm": "0.5rem",
+                      "stack-lg": "2rem",
+                      "section-padding": "2.5rem",
+                      "container-max": "1440px",
+                      "sidebar-width": "260px",
+                      "gutter": "1.5rem",
+                      "stack-md": "1rem"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "table-header": ["Inter"],
+                      "display-kpi": ["Inter"],
+                      "mono-data": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "table-header": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "display-kpi": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #020617; /* surface-deep */
+            font-family: 'Inter', sans-serif;
+        }
+        .login-card {
+            background: linear-gradient(145deg, #1e293b 0%, #122131 100%);
+            border: 1px solid #334155; /* border-subtle */
+        }
+        .glow-overlay {
+            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-gutter selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] glow-overlay"></div>
+</div>
+<!-- Login Container -->
+<main class="relative z-10 w-full max-w-[440px] flex flex-col items-center">
+<!-- Logo & Branding -->
+<div class="mb-stack-lg text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 mb-stack-md rounded-lg bg-primary-container/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[40px]" data-icon="shield_lock">shield_lock</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">Sentinel Insure</h1>
+<p class="font-body-md text-body-md text-on-surface-variant tracking-wide">Enterprise Resource Planning Portal</p>
+</div>
+<!-- Card -->
+<div class="login-card w-full p-8 rounded-xl shadow-2xl relative overflow-hidden">
+<!-- Subtle internal light line -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<form class="space-y-stack-md" id="loginForm" onsubmit="return false">
+<!-- Username Field -->
+<div class="space-y-1.5">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase" for="username">Username</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+</div>
+<input class="w-full bg-surface-deep border border-border-subtle rounded text-on-surface py-2.5 pl-10 pr-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant font-body-md text-body-md" id="username" name="username" placeholder="admin_ref_01" required="" type="text"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase" for="password">Password</label>
+<a class="font-label-caps text-[11px] text-primary hover:text-primary-container transition-colors uppercase" href="#">Forgot?</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
+</div>
+<input class="w-full bg-surface-deep border border-border-subtle rounded text-on-surface py-2.5 pl-10 pr-10 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant font-body-md text-body-md" id="password" name="password" placeholder="••••••••••••" required="" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-3 flex items-center text-outline hover:text-on-surface transition-colors focus:outline-none" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility" id="passwordIcon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center space-x-2 pt-1">
+<input class="w-4 h-4 bg-surface-deep border-border-subtle rounded text-primary focus:ring-offset-surface-deep focus:ring-primary cursor-pointer" id="remember" type="checkbox"/>
+<label class="font-body-md text-body-md text-on-surface-variant cursor-pointer select-none" for="remember">Remember this terminal</label>
+</div>
+<!-- Submit Button -->
+<button class="w-full mt-4 bg-primary text-on-primary font-label-caps py-3 rounded-lg hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center space-x-2 font-bold uppercase tracking-widest shadow-lg shadow-primary/10" id="submitBtn" type="submit">
+<span id="btnText">Secure Login</span>
+<span class="hidden animate-spin h-5 w-5 border-2 border-on-primary border-t-transparent rounded-full" id="btnSpinner"></span>
+</button>
+</form>
+<!-- Security Badge -->
+<div class="mt-8 pt-6 border-t border-border-subtle flex items-center justify-center space-x-4 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-[20px] mb-1" data-icon="security">security</span>
+<span class="font-label-caps text-[9px] uppercase tracking-tighter">SSL Verified</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle"></div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-[20px] mb-1" data-icon="encrypted">encrypted</span>
+<span class="font-label-caps text-[9px] uppercase tracking-tighter">AES-256</span>
+</div>
+</div>
+</div>
+<!-- System Status Footer -->
+<div class="mt-stack-lg flex items-center space-x-4">
+<div class="flex items-center space-x-1.5">
+<div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+<span class="font-body-md text-[12px] text-on-surface-variant">System Online</span>
+</div>
+<span class="text-border-subtle">•</span>
+<span class="font-body-md text-[12px] text-outline">Build 4.2.0-SEC</span>
+</div>
+</main>
+<!-- Background Decorative Elements -->
+<div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] pointer-events-none opacity-20">
+<svg class="relative block w-full h-[150px]" data-name="Layer 1" preserveaspectratio="none" viewbox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
+<path class="fill-surface-variant" d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+</svg>
+</div>
+<script>
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const pwdIcon = document.getElementById('passwordIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                pwdIcon.innerText = 'visibility_off';
+            } else {
+                pwdInput.type = 'password';
+                pwdIcon.innerText = 'visibility';
+            }
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Animation for UI feedback
+            btnText.classList.add('hidden');
+            btnSpinner.classList.remove('hidden');
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            submitBtn.disabled = true;
+
+            // Simulated login delay
+            setTimeout(() => {
+                // In a real scenario, this would redirect or show error
+                submitBtn.classList.remove('bg-primary');
+                submitBtn.classList.add('bg-success');
+                btnSpinner.classList.add('hidden');
+                btnText.classList.remove('hidden');
+                btnText.innerText = 'Access Granted';
+                
+                // Shake effect for "Success"
+                submitBtn.classList.add('animate-bounce');
+            }, 1500);
+        });
+
+        // Add subtle mouse move effect to background
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            const glow = document.querySelector('.glow-overlay');
+            glow.style.background = `radial-gradient(circle at ${x * 100}% ${y * 10}%, rgba(59, 130, 246, 0.1) 0%, transparent 70%)`;
+        });
+    </script>
+</body></html>

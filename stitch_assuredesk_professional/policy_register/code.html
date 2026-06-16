@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Policy Register | SecureInsure</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#111c2d",
+                    "surface-bright": "#1e293b",
+                    "outline-variant": "#424754",
+                    "surface-variant": "#273647",
+                    "on-surface-variant": "#c2c6d6",
+                    "on-primary-fixed": "#001a42",
+                    "inverse-on-surface": "#233143",
+                    "tertiary-container": "#8691a7",
+                    "error": "#ef4444",
+                    "surface-container-lowest": "#010f1f",
+                    "tertiary-fixed-dim": "#bcc7de",
+                    "on-background": "#d4e4fa",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#d4e4fa",
+                    "primary-fixed-dim": "#adc6ff",
+                    "primary": "#adc6ff",
+                    "surface-container-high": "#1c2b3c",
+                    "on-tertiary": "#263143",
+                    "secondary": "#bec6e0",
+                    "border-subtle": "#334155",
+                    "secondary-fixed": "#dae2fd",
+                    "tertiary-fixed": "#d8e3fb",
+                    "error-container": "#93000a",
+                    "surface-dim": "#051424",
+                    "primary-fixed": "#d8e2ff",
+                    "on-secondary-container": "#adb4ce",
+                    "warning": "#f59e0b",
+                    "surface-container-low": "#0d1c2d",
+                    "inverse-primary": "#005ac2",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "surface-tint": "#adc6ff",
+                    "background": "#051424",
+                    "on-primary": "#002e6a",
+                    "surface": "#051424",
+                    "primary-container": "#4d8eff",
+                    "surface-container-highest": "#273647",
+                    "surface-container": "#122131",
+                    "on-error": "#690005",
+                    "on-tertiary-container": "#1f2a3c",
+                    "on-primary-container": "#00285d",
+                    "tertiary": "#bcc7de",
+                    "surface-deep": "#020617",
+                    "secondary-container": "#3f465c",
+                    "success": "#10b981",
+                    "outline": "#8c909f",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-fixed-variant": "#3c475a",
+                    "inverse-surface": "#d4e4fa",
+                    "on-secondary-fixed": "#131b2e",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary": "#283044"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-sm": "0.5rem",
+                    "stack-lg": "2rem",
+                    "section-padding": "2.5rem",
+                    "container-max": "1440px",
+                    "sidebar-width": "260px",
+                    "gutter": "1.5rem",
+                    "stack-md": "1rem"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "table-header": ["Inter"],
+                    "display-kpi": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "table-header": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "display-kpi": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010f1f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4d8eff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- SIDE NAVBAR -->
+<aside class="fixed left-0 top-0 h-full w-[260px] bg-secondary dark:bg-secondary border-r border-border-subtle flex flex-col py-stack-lg z-50 overflow-y-auto">
+<div class="px-gutter mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-on-secondary dark:text-on-secondary-fixed">SecureInsure</h1>
+<p class="text-xs tracking-widest opacity-70 uppercase font-semibold">Records Management</p>
+</div>
+<nav class="flex-1 space-y-1 px-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-colors hover:bg-surface-variant dark:hover:bg-surface-container-highest text-on-secondary-container dark:text-on-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-primary font-bold border-r-2 border-primary bg-surface-variant/30" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-md text-body-md">Registers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-colors hover:bg-surface-variant dark:hover:bg-surface-container-highest text-on-secondary-container dark:text-on-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-body-md text-body-md">Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-colors hover:bg-surface-variant dark:hover:bg-surface-container-highest text-on-secondary-container dark:text-on-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-colors hover:bg-surface-variant dark:hover:bg-surface-container-highest text-on-secondary-container dark:text-on-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-colors hover:bg-surface-variant dark:hover:bg-surface-container-highest text-on-secondary-container dark:text-on-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="person_manage">person_cancel</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded font-bold transition-transform active:scale-95 shadow-lg">
+                New Policy
+            </button>
+</div>
+</aside>
+<!-- TOP NAVBAR -->
+<header class="flex justify-between items-center w-full px-gutter h-16 ml-[260px] max-w-[calc(100%-260px)] sticky top-0 z-40 bg-secondary dark:bg-secondary border-b border-border-subtle">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-surface-deep border-none rounded-full pl-10 pr-4 py-1.5 w-64 text-body-md focus:ring-2 focus:ring-primary" placeholder="Global search..." type="text"/>
+</div>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-secondary-container hover:text-primary-container transition-colors text-body-md" href="#">Directives</a>
+<a class="text-on-secondary-container hover:text-primary-container transition-colors text-body-md" href="#">Audit Log</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-on-secondary-container hover:bg-surface-variant rounded-full transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-secondary-container hover:bg-surface-variant rounded-full transition-colors" data-icon="security">security</button>
+<button class="material-symbols-outlined p-2 text-on-secondary-container hover:bg-surface-variant rounded-full transition-colors" data-icon="help">help</button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline">
+<img alt="Administrator Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVXos9LVbMnvfB37ZhcmMV_M5KeTDEgHJ6E3mPUXlmIjKG2diVMEwlDHtG1lQrSmZeUFkf8PBU7RM35sBazGqzpoZcOj2Ohe6JGrmTeGC2I2XMgRbe5SCAzaEILwSq1jzVv1sJAzYPx2xYBa8dxOg6JSgBw5w8gPmGgdcexswyP-9kwuBJsaA20iAMEI1yyV9nEUu9oQEYoa6OKIkUq_XA4WzT3Ja2fsmttnKXlZ_ROEIP4wO7EvVpIUq3pBnYVrukK2SEhvRCnVc"/>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="ml-[260px] p-8 max-w-7xl mx-auto space-y-stack-lg">
+<!-- PAGE HEADER -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Policy Registration</h2>
+<p class="text-on-surface-variant text-body-md">Create and manage insurance policies in the secure registry.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-border-subtle rounded text-label-caps hover:bg-tertiary/10 transition-colors">Export CSV</button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded text-label-caps font-bold shadow-md hover:brightness-110">Save Record</button>
+</div>
+</div>
+<!-- REGISTRATION FORM CARD -->
+<section class="bg-tertiary/5 border border-border-subtle rounded-lg p-6 shadow-sm">
+<form class="space-y-stack-md">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Policy Info -->
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Policy Number</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="PL-XXXX-XXXX" type="text"/>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Holder Name</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="Full legal name" type="text"/>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">CNIC / ID Number</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="00000-0000000-0" type="text"/>
+</div>
+<!-- Contact & Address -->
+<div class="md:col-span-2 space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Permanent Address</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="Building, Street, City" type="text"/>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Contact Number</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="+92 XXX XXXXXXX" type="tel"/>
+</div>
+<!-- Codes & Premium -->
+<div class="space-y-stack-sm relative">
+<label class="block text-label-caps text-on-surface-variant uppercase">SR Code (Searchable)</label>
+<div class="relative">
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="Select SR..." type="text"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none" data-icon="unfold_more">unfold_more</span>
+</div>
+</div>
+<div class="space-y-stack-sm relative">
+<label class="block text-label-caps text-on-surface-variant uppercase">SM/SSM Code</label>
+<div class="relative">
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="Select SM..." type="text"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none" data-icon="unfold_more">unfold_more</span>
+</div>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Premium Amount (PKR)</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0" placeholder="50,000" type="number"/>
+</div>
+<!-- Dates -->
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Issue Date</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 appearance-none" type="date"/>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Due Date</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 appearance-none" type="date"/>
+</div>
+<div class="space-y-stack-sm">
+<label class="block text-label-caps text-on-surface-variant uppercase">Last Paid Date</label>
+<input class="w-full bg-surface-deep border border-border-subtle rounded px-4 py-2.5 text-on-surface focus:border-primary focus:ring-0 appearance-none" type="date"/>
+</div>
+</div>
+</form>
+</section>
+<!-- DATA TABLE SECTION -->
+<div class="bg-tertiary/5 border border-border-subtle rounded-lg overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Existing Policy Records</h3>
+<div class="flex items-center gap-2">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm" data-icon="filter_list">filter_list</span>
+<select class="bg-surface-deep border-border-subtle rounded pl-10 pr-8 py-1.5 text-xs font-label-caps text-on-surface-variant focus:ring-primary appearance-none">
+<option>All Policies</option>
+<option>Active</option>
+<option>Lapsed</option>
+<option>Grace Period</option>
+</select>
+</div>
+<button class="p-2 hover:bg-surface-variant rounded transition-colors material-symbols-outlined" data-icon="refresh">refresh</button>
+</div>
+</div>
+<!-- TABLE CONTAINER -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high border-b border-border-subtle">
+<tr>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">Policy ID</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">Holder</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">Contact</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">Premium</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">Due Date</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider text-center">Status</th>
+<th class="px-6 py-3 font-table-header text-table-header text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright/5 transition-colors group">
+<td class="px-6 py-4 font-mono-data text-mono-data text-primary">PL-2023-0812</td>
+<td class="px-6 py-4">
+<div class="text-body-md font-bold text-on-surface">Ahmed Siddiqui</div>
+<div class="text-xs text-on-surface-variant">42201-1234567-1</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">0333-1234567</td>
+<td class="px-6 py-4 font-mono-data text-on-surface">PKR 75,000</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">15 Oct 2024</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors material-symbols-outlined" data-icon="edit">edit</button>
+<button class="p-1.5 hover:text-error transition-colors material-symbols-outlined" data-icon="delete">delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright/5 transition-colors group">
+<td class="px-6 py-4 font-mono-data text-mono-data text-primary">PL-2023-0945</td>
+<td class="px-6 py-4">
+<div class="text-body-md font-bold text-on-surface">Sarah Khan</div>
+<div class="text-xs text-on-surface-variant">42101-9876543-2</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">0321-7654321</td>
+<td class="px-6 py-4 font-mono-data text-on-surface">PKR 120,000</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">02 Nov 2024</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-warning/10 text-warning text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                                    Grace
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors material-symbols-outlined" data-icon="edit">edit</button>
+<button class="p-1.5 hover:text-error transition-colors material-symbols-outlined" data-icon="delete">delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright/5 transition-colors group">
+<td class="px-6 py-4 font-mono-data text-mono-data text-primary">PL-2022-1102</td>
+<td class="px-6 py-4">
+<div class="text-body-md font-bold text-on-surface">Zubair Malik</div>
+<div class="text-xs text-on-surface-variant">35201-5544332-1</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">0300-5554444</td>
+<td class="px-6 py-4 font-mono-data text-on-surface">PKR 45,000</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">12 Aug 2024</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-error/10 text-error text-[10px] font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                    Lapsed
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors material-symbols-outlined" data-icon="edit">edit</button>
+<button class="p-1.5 hover:text-error transition-colors material-symbols-outlined" data-icon="delete">delete</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINATION -->
+<div class="px-6 py-4 bg-surface-container flex items-center justify-between">
+<span class="text-xs text-on-surface-variant font-body-md">Showing 1 to 3 of 124 records</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded hover:bg-surface-variant transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded text-xs font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded hover:bg-surface-variant transition-colors text-xs">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded hover:bg-surface-variant transition-colors text-xs">3</button>
+<span class="w-8 h-8 flex items-center justify-center text-xs">...</span>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- ATMOSPHERIC ELEMENT (Subtle Gradient Glow) -->
+<div class="fixed bottom-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+<div class="fixed top-20 left-[300px] w-64 h-64 bg-secondary-container/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+</main>
+<script>
+        // Simple micro-interaction for active input states
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', () => {
+                element.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            element.addEventListener('blur', () => {
+                element.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+
+        // Search highlight logic (placeholder)
+        const globalSearch = document.querySelector('input[placeholder="Global search..."]');
+        globalSearch.addEventListener('input', (e) => {
+            console.log('Searching for:', e.target.value);
+            // Implementation for live filtering would go here
+        });
+    </script>
+</body></html>

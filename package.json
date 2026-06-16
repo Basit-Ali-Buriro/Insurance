@@ -1,0 +1,63 @@
+{
+  "name": "insurance-records-management-system",
+  "version": "1.0.0",
+  "description": "Insurance Policy Records Management System - Standalone Desktop ERP",
+  "main": "main/main.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "build": "vite build",
+    "postinstall": "electron-rebuild -f -w better-sqlite3,bcrypt",
+    "package": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.8.0",
+    "exceljs": "^4.4.0",
+    "lucide-react": "^0.475.0",
+    "node-machine-id": "^1.1.12",
+    "nodemailer": "^6.10.0",
+    "pdfkit": "^0.16.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.1",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "electron": "^34.0.2",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.1.0",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.insurance.pms",
+    "productName": "Insurance Records Management System",
+    "copyright": "Copyright © 2026 Developer",
+    "icon": "assets/icon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "main/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

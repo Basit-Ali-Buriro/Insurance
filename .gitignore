@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+.env
+*.log
+
+# Ignore specific zip files requested by user
+setup.zip
+source_code.zip
+backup.zip
