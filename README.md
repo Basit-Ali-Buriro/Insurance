@@ -60,11 +60,59 @@ npm run build
 ```
 
 ### 5. Package as Executable
+
+**Windows:**
+```bash
+npm run electron:build
+```
+
+**macOS:**
+```bash
+npm run electron:build
+```
+
+**Linux:**
 ```bash
 npm run electron:build
 ```
 
 The packaged application will be in the `release/` directory.
+
+## 🍎 macOS Specific Setup
+
+### Building for macOS
+
+The application supports macOS and will automatically create the appropriate build:
+
+```bash
+# Build for macOS (.app bundle and .dmg installer)
+npm run electron:build
+```
+
+This generates:
+- `.app` application bundle
+- `.dmg` installer file for distribution
+
+### macOS Data Directory
+
+Application data (database, backups) is stored in:
+```
+~/Library/Application Support/Insurance/
+```
+
+### Code Signing & Notarization
+
+For production distribution on macOS:
+
+1. **Obtain Apple Developer Certificate**
+2. **Sign the app** (automatic if certificate is installed)
+3. **Notarize with Apple** (required for distribution outside App Store)
+
+Update `vite.config.js` or electron builder config with your signing credentials if needed.
+
+### M1/M2 Support
+
+Modern Electron versions include native support for Apple Silicon (M1/M2) processors. The build process automatically creates universal binaries.
 
 ## 📁 Project Structure
 
