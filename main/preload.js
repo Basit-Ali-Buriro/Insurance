@@ -94,4 +94,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Database Reset / Seed
   resetDatabase:  ()          => ipcRenderer.invoke('database:reset'),
   seedDatabase:   ()          => ipcRenderer.invoke('database:seed'),
+  reloadApp:      ()          => ipcRenderer.invoke('app:reload'),
 });

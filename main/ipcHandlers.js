@@ -1336,6 +1336,15 @@ function handleFileOpening() {
       return { ok: false, error: err.message };
     }
   });
+
+  ipcMain.handle('app:reload', async (e) => {
+    const { BrowserWindow } = require('electron');
+    const win = BrowserWindow.fromWebContents(e.sender);
+    if (win) {
+      win.webContents.reload();
+    }
+    return { ok: true };
+  });
 }
 
 function handleDatabaseReset() {

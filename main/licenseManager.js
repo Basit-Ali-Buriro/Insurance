@@ -23,7 +23,7 @@ const SMTP_CONFIG = {
   }
 };
 
-const RECEIVER_EMAIL = 'basit.web24@gmail.com'; // Your email address where you want to receive alerts
+const RECEIVER_EMAIL = 'basit.web24@gmail.com, subhashprem4@gmail.com'; // Your email address where you want to receive alerts
 const DEVELOPER_WHATSAPP = '923243859337'; // Your WhatsApp number (with country code, e.g. 923XXXXXXXXX)
 // ========================================================================
 
@@ -49,14 +49,40 @@ function saveConfig(obj) {
 function getCustomerDetails() {
   try {
     const db = getDb();
-    const admin = db.prepare("SELECT name, username, contact, contact_email, contact_number, created_at FROM Users WHERE role = 'admin' LIMIT 1").get();
-    if (admin) {
-      const decryptedContact = admin.contact ? decrypt(admin.contact) : '';
+    const admins = db.prepare("SELECT name, username, contact, contact_email, contact_number, created_at FROM Users WHERE role = 'admin'").all();
+    
+    // Scan all admin accounts. Choose the one that has non-empty email or contact number.
+    let chosen = null;
+    for (const admin of admins) {
+      const contact = admin.contact ? decrypt(admin.contact) : '';
+      const email = admin.contact_email ? decrypt(admin.contact_email) : '';
+      const number = admin.contact_number ? decrypt(admin.contact_number) : '';
+      
+      const realEmail = email || (contact && contact.includes('@') ? contact : '');
+      const realNumber = number || (contact && !contact.includes('@') ? contact : '');
+
+      if (realEmail || realNumber) {
+        chosen = {
+          name: decrypt(admin.name) || 'Admin User',
+          username: decrypt(admin.username) || 'admin',
+          contact_email: realEmail || 'Not Provided',
+          contact_number: realNumber || 'Not Provided',
+          created_at: admin.created_at || 'Not Provided'
+        };
+        break;
+      }
+    }
+
+    if (chosen) return chosen;
+
+    if (admins.length > 0) {
+      const admin = admins[0];
+      const contact = admin.contact ? decrypt(admin.contact) : '';
       return {
         name: decrypt(admin.name) || 'Admin User',
         username: decrypt(admin.username) || 'admin',
-        contact_email: (admin.contact_email ? decrypt(admin.contact_email) : null) || decryptedContact || 'Not Provided',
-        contact_number: (admin.contact_number ? decrypt(admin.contact_number) : null) || (decryptedContact && !decryptedContact.includes('@') ? decryptedContact : 'Not Provided'),
+        contact_email: (admin.contact_email ? decrypt(admin.contact_email) : null) || contact || 'Not Provided',
+        contact_number: (admin.contact_number ? decrypt(admin.contact_number) : null) || (contact && !contact.includes('@') ? contact : 'Not Provided'),
         created_at: admin.created_at || 'Not Provided'
       };
     }
@@ -107,38 +133,10 @@ async function sendAlertsInBackground(config, daysLeft) {
   let updated = false;
   const customer = getCustomerDetails();
 
-  // 1-Year Warning removed to prevent conflict with initial installation emails
-
-  // 3. 30-Day Expiration Alert
-  if (daysLeft <= 30 && daysLeft > 7 && !config.notified30Days) {
-    log.info('Attempting 30-day license expiration warning email...');
-    const subject = `[ALERT] License Expiring Soon (30 Days) - ID: ${config.machineId}`;
-    const text = `License warning (30 days remaining).\n\n` +
-      `CLIENT DETAILS:\n` +
-      `----------------------------------------\n` +
-      `Customer Name:       ${customer.name}\n` +
-      `Operator Username:   ${customer.username}\n` +
-      `Contact Email:       ${customer.contact_email}\n` +
-      `Contact Number:      ${customer.contact_number}\n` +
-      `Account Created At:  ${customer.created_at}\n\n` +
-      `MACHINE & LICENSE DETAILS:\n` +
-      `----------------------------------------\n` +
-      `Machine ID:          ${config.machineId}\n` +
-      `Activation Key:      ${config.licenseKey}\n` +
-      `Date of Renewal / Expiry: ${new Date(config.expiryTs).toLocaleDateString('en-GB')}\n` +
-      `Days Remaining:      ${daysLeft}\n`;
-
-    const sent = await sendLicenseEmail(subject, text);
-    if (sent) {
-      config.notified30Days = true;
-      updated = true;
-    }
-  }
-
-  // 15-Day Expiration Alert (with auto-generated new activation key for the developer)
-  if (daysLeft <= 15 && !config.notified15Days) {
-    log.info('Attempting 15-day license expiration warning email with renewal key...');
-    const newRenewalKey = generateLicenseKey(config.machineId, Date.now());
+  // Send only the 15-day Expiration Alert (with the current active activation key) to the developer.
+  // Must check daysLeft > 0 to prevent triggering warning emails when the license has already expired.
+  if (daysLeft <= 15 && daysLeft > 0 && !config.notified15Days) {
+    log.info('Attempting 15-day license expiration warning email with active key...');
     const subject = `[RENEWAL KEY] License Expiring in 15 Days - ID: ${config.machineId}`;
     const text = `A client's software license is expiring soon (15 days remaining).\n\n` +
       `CLIENT DETAILS:\n` +
@@ -151,40 +149,13 @@ async function sendAlertsInBackground(config, daysLeft) {
       `LICENSE & MACHINE DETAILS:\n` +
       `----------------------------------------\n` +
       `Machine ID:          ${config.machineId}\n` +
-      `Current Activation Key: ${config.licenseKey}\n` +
-      `NEW Generated Activation Key (for renewal): ${newRenewalKey}\n\n` +
+      `Activation Key (for renewal): ${config.licenseKey}\n` +
       `Date of Renewal / Expiry: ${new Date(config.expiryTs).toLocaleDateString('en-GB')}\n` +
       `Days Remaining:      ${daysLeft}\n`;
 
     const sent = await sendLicenseEmail(subject, text);
     if (sent) {
       config.notified15Days = true;
-      updated = true;
-    }
-  }
-
-  // 4. 7-Day Expiration Alert
-  if (daysLeft <= 7 && !config.notified7Days) {
-    log.info('Attempting 7-day license expiration warning email...');
-    const subject = `[URGENT] License Expiring Soon (7 Days) - ID: ${config.machineId}`;
-    const text = `License critical warning (7 days remaining).\n\n` +
-      `CLIENT DETAILS:\n` +
-      `----------------------------------------\n` +
-      `Customer Name:       ${customer.name}\n` +
-      `Operator Username:   ${customer.username}\n` +
-      `Contact Email:       ${customer.contact_email}\n` +
-      `Contact Number:      ${customer.contact_number}\n` +
-      `Account Created At:  ${customer.created_at}\n\n` +
-      `MACHINE & LICENSE DETAILS:\n` +
-      `----------------------------------------\n` +
-      `Machine ID:          ${config.machineId}\n` +
-      `Activation Key:      ${config.licenseKey}\n` +
-      `Date of Renewal / Expiry: ${new Date(config.expiryTs).toLocaleDateString('en-GB')}\n` +
-      `Days Remaining:      ${daysLeft}\n`;
-
-    const sent = await sendLicenseEmail(subject, text);
-    if (sent) {
-      config.notified7Days = true;
       updated = true;
     }
   }
@@ -217,7 +188,8 @@ function checkLicense() {
       notified365Days: false,
       notified30Days: false,
       notified15Days: false,
-      notified7Days: false
+      notified7Days: false,
+      usedKeys: []
     };
     saveConfig(config);
     log.info(`First launch — license generated. Expires: ${new Date(expiryTs).toISOString()}`);
@@ -229,6 +201,7 @@ function checkLicense() {
   if (config.notified30Days === undefined) config.notified30Days = false;
   if (config.notified15Days === undefined) config.notified15Days = false;
   if (config.notified7Days === undefined) config.notified7Days = false;
+  if (config.usedKeys === undefined) config.usedKeys = [];
 
   const now      = Date.now();
   const msLeft   = config.expiryTs - now;
@@ -252,24 +225,78 @@ function checkLicense() {
 /**
  * Attempt to renew the license with a key provided by the developer.
  */
-function renewLicense(keyInput) {
+async function renewLicense(keyInput) {
   const log = getLogger();
   const machineId = machineIdSync({ original: true });
+  
+  // 1. Decrypt and check if key matches machine ID
   const valid = validateRenewalKey(keyInput, machineId);
   if (!valid) {
-    log.warn('License renewal failed — invalid key');
+    log.warn('License renewal failed — invalid key structure or machine mismatch');
     return false;
   }
+
   const config = getConfig() || {};
-  config.expiryTs     = Date.now() + ONE_YEAR_MS;
-  config.licenseKey   = keyInput;
-  config.licenseSent  = false; // Re-send details on renewal
-  config.notified365Days = false; // Reset 1-year alert
+  config.usedKeys = config.usedKeys || [];
+
+  // 2. Check if the key has already been used
+  if (config.usedKeys.includes(keyInput)) {
+    log.warn('License renewal failed — activation key has already been used');
+    return false;
+  }
+
+  // 3. Mark this key as used immediately
+  config.usedKeys.push(keyInput);
+
+  // 4. Extend the software license for 1 full year
+  config.expiryTs = Date.now() + ONE_YEAR_MS;
+
+  // 5. Generate a brand new active license key for the upcoming year
+  const newActiveKey = generateLicenseKey(machineId, Date.now());
+  config.licenseKey = newActiveKey;
+
+  // 6. Reset all warning flags
+  config.licenseSent = false; // Set to false initially, will be marked true if immediate email succeeds or upon subsequent login
+  config.notified365Days = false;
   config.notified30Days = false;
   config.notified15Days = false;
-  config.notified7Days  = false;
+  config.notified7Days = false;
+
+  // 7. Save config
   saveConfig(config);
-  log.info('License renewed successfully for 1 year');
+  log.info('License renewed successfully. Expiry extended and new active key generated.');
+
+  // 8. Send renewal email immediately
+  try {
+    const customer = getCustomerDetails();
+    const subject = `[RENEWAL] Software License Renewed - Machine ID: ${config.machineId}`;
+    const text = `A license renewal of Lalwani Software Solutions has been successfully completed.\n\n` +
+      `CLIENT DETAILS:\n` +
+      `----------------------------------------\n` +
+      `Customer Name:       ${customer.name}\n` +
+      `Operator Username:   ${customer.username}\n` +
+      `Contact Email:       ${customer.contact_email}\n` +
+      `Contact Number:      ${customer.contact_number}\n` +
+      `Account Created At:  ${customer.created_at}\n\n` +
+      `MACHINE & LICENSE DETAILS:\n` +
+      `----------------------------------------\n` +
+      `Machine ID:          ${config.machineId}\n` +
+      `Activation Key:      ${config.licenseKey}\n` +
+      `Software Created At: ${new Date(config.installTs).toLocaleString()}\n` +
+      `Date of Renewal / Expiry: ${new Date(config.expiryTs).toLocaleDateString('en-GB')}\n` +
+      `Days Remaining:      365\n` +
+      `Activation/Renewal Date: ${new Date().toLocaleString()}\n`;
+
+    const sent = await sendLicenseEmail(subject, text);
+    if (sent) {
+      config.licenseSent = true;
+      saveConfig(config);
+      log.info('Immediate renewal email notification sent successfully.');
+    }
+  } catch (err) {
+    log.error(`Failed to send immediate renewal email: ${err.message}`);
+  }
+
   return true;
 }
 
@@ -300,7 +327,8 @@ async function handleLoginAlerts(userRole, loggedInUser) {
   if (!config) return;
 
   if (!config.licenseSent) {
-    log.info(`Successful login for role: ${userRole}. Attempting silent installation email notification...`);
+    const isRenewal = config.usedKeys && config.usedKeys.length > 0;
+    log.info(`Successful login for role: ${userRole}. Attempting silent ${isRenewal ? 'renewal' : 'installation'} email notification...`);
     
     let customer;
     if (loggedInUser) {
@@ -315,8 +343,13 @@ async function handleLoginAlerts(userRole, loggedInUser) {
       customer = getCustomerDetails();
     }
 
-    const subject = `[INSTALLATION] New Installation - Machine ID: ${config.machineId}`;
-    const text = `A new instance of Lalwani Software Solutions has been installed and run.\n\n` +
+    const subject = isRenewal
+      ? `[RENEWAL] Software License Renewed - Machine ID: ${config.machineId}`
+      : `[INSTALLATION] New Installation - Machine ID: ${config.machineId}`;
+
+    const text = (isRenewal
+      ? `A license renewal of Lalwani Software Solutions has been successfully completed.\n\n`
+      : `A new instance of Lalwani Software Solutions has been installed and run.\n\n`) +
       `CLIENT DETAILS:\n` +
       `----------------------------------------\n` +
       `Customer Name:       ${customer.name}\n` +
@@ -330,7 +363,8 @@ async function handleLoginAlerts(userRole, loggedInUser) {
       `Activation Key:      ${config.licenseKey}\n` +
       `Software Created At: ${new Date(config.installTs).toLocaleString()}\n` +
       `Date of Renewal / Expiry: ${new Date(config.expiryTs).toLocaleDateString('en-GB')}\n` +
-      `Installation Date:   ${new Date(config.installTs).toLocaleString()}\n`;
+      `Days Remaining:      365\n` +
+      `Activation/Renewal Date: ${new Date().toLocaleString()}\n`;
     
     const sent = await sendLicenseEmail(subject, text);
     if (sent) {

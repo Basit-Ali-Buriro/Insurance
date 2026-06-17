@@ -253,7 +253,7 @@ export default function Settings({ user, onProfileUpdate }) {
                       const res = await api.restoreBackup();
                       if (res?.ok) {
                         toast('Database restored successfully! Reloading system...', 'success');
-                        setTimeout(() => { window.location.reload(); }, 1500);
+                        setTimeout(() => { api.reloadApp(); }, 1500);
                       } else if (res?.canceled) {
                         toast('Restore operation cancelled', 'info');
                       } else {
@@ -266,6 +266,56 @@ export default function Settings({ user, onProfileUpdate }) {
                 </button>
               </div>
             </div>
+
+            {/* Developer Reset Section */}
+            {user?.role === 'developer' && (
+              <div className="space-y-3 pt-6 border-t border-border-subtle/50">
+                <h4 className="text-sm font-bold text-error flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px]">warning</span> Developer System Operations
+                </h4>
+                <p className="text-xs text-on-surface-variant">
+                  Wipe all sample data (policies, proposals, team structures, notifications, targets) before shipping. User accounts will NOT be deleted.
+                </p>
+                <div className="flex flex-wrap gap-3 pt-1">
+                  <button
+                    id="btn-settings-reset-db"
+                    className="flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-error/20 outline-none"
+                    onClick={async () => {
+                      if (confirm("WARNING: This will permanently delete all policies, proposals, area managers, SSMs, SMs, SRs, notifications, and targets, leaving only the registered user accounts. Are you sure you want to proceed?")) {
+                        toast('Resetting system database...', 'info');
+                        const res = await api.resetDatabase();
+                        if (res?.ok) {
+                          toast('Database reset successfully! Reloading system...', 'success');
+                          setTimeout(() => { api.reloadApp(); }, 1500);
+                        } else {
+                          toast(res?.error || 'Database reset failed', 'error');
+                        }
+                      }
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-sm">delete_forever</span> Reset Database
+                  </button>
+                  <button
+                    id="btn-settings-seed-db"
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-purple-600/20 outline-none"
+                    onClick={async () => {
+                      if (confirm("Seeding database with sample records will overwrite/add mock records. Proceed?")) {
+                        toast('Seeding database with sample records...', 'info');
+                        const res = await api.seedDatabase();
+                        if (res?.ok) {
+                          toast('Database seeded successfully! Reloading system...', 'success');
+                          setTimeout(() => { api.reloadApp(); }, 1500);
+                        } else {
+                          toast(res?.error || 'Database seeding failed', 'error');
+                        }
+                      }
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-sm">science</span> Seed Sample Data
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -291,6 +341,7 @@ export default function Settings({ user, onProfileUpdate }) {
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[16px] text-outline">mail</span>
                   <a href="mailto:premlalwani291@gmail.com" className="hover:text-electric-blue transition-colors">premlalwani291@gmail.com</a>
+                  <a href="mailto:subhashprem4@gmail.com" className="hover:text-electric-blue transition-colors">subhashprem4@gmail.com</a>
                 </div>
               </div>
             </div>

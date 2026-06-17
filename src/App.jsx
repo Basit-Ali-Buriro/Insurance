@@ -36,7 +36,7 @@ export default function App() {
   const handleLogin = (userData) => {
     setUser(userData);
     setActivePage('dashboard');
-    if (licenseInfo) {
+    if (licenseInfo && userData?.role !== 'developer') {
       if (licenseInfo.daysLeft <= 15 && licenseInfo.daysLeft > 0) {
         alert(`${licenseInfo.daysLeft} days are remaining in the License Expiration`);
       } else if (licenseInfo.daysLeft <= 30 && licenseInfo.daysLeft > 15) {

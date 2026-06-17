@@ -45,12 +45,12 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
       </div>
 
       {/* Main Lock Canvas */}
-      <main className="relative z-10 w-full max-w-[540px] px-md">
+      <main className="relative z-10 w-full max-w-[540px] px-4">
         {/* Brand Identity */}
         <div className="flex flex-col items-center mb-8">
           <img src={logo} alt="Lalwani Logo" className="w-28 h-28 mb-4 object-contain rounded-lg shadow-2xl" />
           <h1 className="text-headline-md text-on-surface font-bold tracking-wider font-['Outfit']">Lalwani</h1>
-          <p className="font-label-md text-label-md text-on-surface-variant mt-1 uppercase tracking-[0.2em] font-medium">Software Solutions</p>
+          <p className="text-label-caps text-on-surface-variant mt-1 uppercase tracking-[0.2em] font-medium">Software Solutions</p>
         </div>
 
         {/* Glassmorphism Container */}
@@ -59,18 +59,18 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
           <div className="flex items-center gap-4 mb-6 p-4 bg-electric-blue/10 border border-electric-blue/20 rounded-lg">
             <span className="material-symbols-outlined text-electric-blue" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
             <div>
-              <h2 className="font-headline-sm text-headline-sm text-on-surface leading-tight">License Expired</h2>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">System-wide lock initiated due to subscription lapse.</p>
+              <h2 className="text-headline-md text-on-surface leading-tight font-bold">License Expired</h2>
+              <p className="text-body-md text-xs text-on-surface-variant">System-wide lock initiated due to subscription lapse.</p>
             </div>
           </div>
 
           {/* Machine Context */}
           <div className="mb-6 space-y-2">
             <div className="flex justify-between items-center px-1">
-              <span className="font-label-md text-label-md text-on-surface-variant">Unique Machine ID</span>
+              <span className="text-xs font-semibold text-on-surface-variant">Unique Machine ID</span>
               <button 
                 type="button" 
-                className="flex items-center gap-1 font-label-md text-label-md text-electric-blue hover:text-primary-container transition-colors focus:outline-none" 
+                className="flex items-center gap-1 text-xs font-semibold text-electric-blue hover:text-primary-container transition-colors focus:outline-none" 
                 onClick={handleCopy}
               >
                 <span className="material-symbols-outlined text-[16px]">content_copy</span>
@@ -86,12 +86,12 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
           {/* Renewal Form */}
           <form className="space-y-6" onSubmit={handleSubmit} noValidate>
             <div className="space-y-2">
-              <label className="font-label-md text-label-md text-on-surface-variant ml-1" htmlFor="license-key">Renewal Key</label>
+              <label className="text-xs font-semibold text-on-surface-variant ml-1" htmlFor="license-key">Renewal Key</label>
               <div className="relative group">
                 <input
                   className="w-full h-14 bg-deep-charcoal border border-outline-variant rounded-lg px-4 pr-12 font-mono text-body-lg text-on-surface focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all placeholder:text-outline-variant"
                   id="license-key"
-                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  placeholder="Enter or paste activation key..."
                   required
                   type="text"
                   value={key}
@@ -102,7 +102,7 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
                   <span className="material-symbols-outlined">vpn_key</span>
                 </div>
               </div>
-              <p className="font-label-sm text-label-sm text-on-surface-variant/60 ml-1 italic">
+              <p className="text-[11px] text-on-surface-variant/70 ml-1 italic">
                 Contact your account manager if you have not received your new key.
               </p>
             </div>
@@ -139,7 +139,7 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
           {/* Footer Actions */}
           <div className="mt-8 pt-4 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-4">
             <button 
-              className="font-label-md text-label-md text-on-surface-variant hover:text-electric-blue transition-colors flex items-center gap-1 group bg-transparent border-none cursor-pointer" 
+              className="text-xs font-semibold text-on-surface-variant hover:text-electric-blue transition-colors flex items-center gap-1 group bg-transparent border-none cursor-pointer" 
               onClick={() => {
                 const msg = `Assalam o Alaikum Developer, please activate my license. My Machine ID is: ${machineIdVal}`;
                 api.openWhatsAppAlert(msg);
@@ -150,13 +150,13 @@ export default function LicenseRenewalPage({ onRenewed, licenseInfo }) {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-electric-blue animate-pulse"></div>
-              <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Locked State</span>
+              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-widest">Locked State</span>
             </div>
           </div>
         </div>
 
         {/* Security Notice */}
-        <p className="mt-6 text-center font-body-sm text-body-sm text-on-surface-variant/40 px-6">
+        <p className="mt-6 text-center text-xs text-on-surface-variant/40 px-6">
           This instance of Lalwani Software Solutions is protected by hardware-bound encryption. Unauthorized attempts to bypass this screen will be logged and reported to the system administrator.
         </p>
 
