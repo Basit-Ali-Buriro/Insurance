@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const { getDb, decryptRow, seedSampleData, closeDb }  = require('./database');
 const { encrypt, decrypt }   = require('./crypto');
 const { getLogger }          = require('./logger');
-const { checkLicense, renewLicense, openWhatsAppAlert } = require('./licenseManager');
+const { checkLicense, renewLicense, openWhatsAppAlert, sendNewUserCredentialsEmail } = require('./licenseManager');
 
 /* ─── Encrypted field maps per table ─── */
 const ENC = {
@@ -74,6 +74,13 @@ function handleUsers() {
       db.prepare('INSERT INTO Users (name, username, password_hash, role, status, contact_email, contact_number) VALUES (?,?,?,?,?,?,?)')
         .run(encrypt(name), encrypt(username), hash, role, status, encrypt(contact_email || ''), encrypt(contact_number || ''));
       log().info(`User created: ${username}`);
+      
+      if (contact_email) {
+        sendNewUserCredentialsEmail(contact_email, name, username, password).catch(err => {
+          log().error(`Failed to send credentials email for new user ${username}: ${err.message}`);
+        });
+      }
+
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err.message };
@@ -1383,6 +1390,53 @@ function handleDatabaseReset() {
       return { ok: true };
     } catch (err) {
       log().error(`Database seeding failed: ${err.message}`);
+      return { ok: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('developer:package-app', async () => {
+    const log = getLogger();
+    log.info('Starting UI-triggered package & build process...');
+    try {
+      // 1. Copy database to root
+      const sourceDb = path.join(app.getPath('userData'), 'appdata', 'sysconfig.dat');
+      const targetDb = path.join(app.getAppPath(), 'sysconfig.dat');
+      if (fs.existsSync(sourceDb)) {
+        fs.copyFileSync(sourceDb, targetDb);
+        log.info('Database copied to project root successfully.');
+      } else {
+        log.warn('No source database found to copy.');
+      }
+
+      // 2. Execute the package command
+      const { exec } = require('child_process');
+      await new Promise((resolve, reject) => {
+        exec('npm run package', { cwd: app.getAppPath() }, (error, stdout, stderr) => {
+          if (error) {
+            log.error(`Build failed: ${error.message}`);
+            reject(error);
+          } else {
+            log.info('Build completed successfully.');
+            resolve();
+          }
+        });
+      });
+
+      // 3. Zip the output
+      const exePath = path.join(app.getAppPath(), 'release', 'Insurance Records Management System Setup 1.0.1.exe');
+      const zipPath = path.join(app.getAppPath(), 'Insurance_Setup_Exe.zip');
+      if (fs.existsSync(exePath)) {
+        const AdmZip = require('adm-zip');
+        const zip = new AdmZip();
+        zip.addLocalFile(exePath);
+        zip.writeZip(zipPath);
+        log.info('Setup EXE zipped successfully.');
+        return { ok: true };
+      } else {
+        return { ok: false, error: 'Setup executable not found after build.' };
+      }
+    } catch (err) {
+      log.error(`Developer package app failed: ${err.message}`);
       return { ok: false, error: err.message };
     }
   });

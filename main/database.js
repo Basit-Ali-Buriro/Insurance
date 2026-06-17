@@ -287,8 +287,24 @@ function seedSampleData(db) {
 
 /* ───────────────────────────── INIT ───────────────────────────── */
 function initializeDatabase() {
-  const db = getDb();
   const log = getLogger();
+  const dbDir = path.dirname(DB_PATH);
+
+  if (!fs.existsSync(DB_PATH)) {
+    // If the database doesn't exist, check if a pre-seeded template database exists in the app package root
+    const templatePath = path.join(app.getAppPath(), 'sysconfig.dat');
+    if (fs.existsSync(templatePath)) {
+      log.info(`Found pre-seeded template database at ${templatePath}. Copying to AppData...`);
+      try {
+        if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+        fs.copyFileSync(templatePath, DB_PATH);
+      } catch (err) {
+        log.error(`Failed to copy template database: ${err.message}`);
+      }
+    }
+  }
+
+  const db = getDb();
 
   db.exec(SCHEMA);
 

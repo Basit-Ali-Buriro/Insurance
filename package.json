@@ -7,7 +7,7 @@
     "dev": "concurrently \"vite\" \"wait-on http://127.0.0.1:5173 && electron .\"",
     "build": "vite build",
     "postinstall": "electron-rebuild -f -w better-sqlite3,bcrypt",
-    "package": "npm run build && electron-builder"
+    "package": "node copy-db-to-project.js && npm run build && electron-builder"
   },
   "dependencies": {
     "adm-zip": "^0.5.17",
@@ -48,7 +48,8 @@
     "files": [
       "dist/**/*",
       "main/**/*",
-      "package.json"
+      "package.json",
+      "sysconfig.dat"
     ],
     "win": {
       "target": "nsis",

@@ -10,6 +10,27 @@ export default function Settings({ user, onProfileUpdate }) {
   const [savingPwd, setSavingPwd] = useState(false);
   const [pwdErrors, setPwdErrors] = useState({});
   const [showPwd,   setShowPwd]   = useState({ curr:false, new:false, confirm:false });
+  const [packaging, setPackaging] = useState(false);
+
+  const handlePackageApp = async () => {
+    if (!confirm("Are you sure you want to build and package the app setup? This will copy the current database as the template, compile React, build the Electron package, and create a ZIP archive of the installer. This may take up to a minute.")) {
+      return;
+    }
+    setPackaging(true);
+    toast('Starting software packaging & zip creation. Please wait...', 'info');
+    try {
+      const res = await api.packageApp();
+      if (res?.ok) {
+        toast('Software packaged and zipped successfully! Created: Insurance_Setup_Exe.zip in project root.', 'success');
+      } else {
+        toast(res?.error || 'Packaging failed.', 'error');
+      }
+    } catch (err) {
+      toast(err.message || 'Error occurred during packaging.', 'error');
+    } finally {
+      setPackaging(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!profile.name.trim() || !profile.username.trim()) {
@@ -274,12 +295,12 @@ export default function Settings({ user, onProfileUpdate }) {
                   <span className="material-symbols-outlined text-[18px]">warning</span> Developer System Operations
                 </h4>
                 <p className="text-xs text-on-surface-variant">
-                  Wipe all sample data (policies, proposals, team structures, notifications, targets) before shipping. User accounts will NOT be deleted.
+                  Wipe all sample data (policies, proposals, team structures, notifications, targets) before shipping. User accounts will NOT be deleted. You can also package and zip the standalone application setup installer.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-1">
                   <button
                     id="btn-settings-reset-db"
-                    className="flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-error/20 outline-none"
+                    className="flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-error/20 outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                     onClick={async () => {
                       if (confirm("WARNING: This will permanently delete all policies, proposals, area managers, SSMs, SMs, SRs, notifications, and targets, leaving only the registered user accounts. Are you sure you want to proceed?")) {
                         toast('Resetting system database...', 'info');
@@ -292,12 +313,13 @@ export default function Settings({ user, onProfileUpdate }) {
                         }
                       }
                     }}
+                    disabled={packaging}
                   >
                     <span className="material-symbols-outlined text-sm">delete_forever</span> Reset Database
                   </button>
                   <button
                     id="btn-settings-seed-db"
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-purple-600/20 outline-none"
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-purple-600/20 outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                     onClick={async () => {
                       if (confirm("Seeding database with sample records will overwrite/add mock records. Proceed?")) {
                         toast('Seeding database with sample records...', 'info');
@@ -310,8 +332,18 @@ export default function Settings({ user, onProfileUpdate }) {
                         }
                       }
                     }}
+                    disabled={packaging}
                   >
                     <span className="material-symbols-outlined text-sm">science</span> Seed Sample Data
+                  </button>
+                  <button
+                    id="btn-settings-package-app"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 shadow-md shadow-primary/20 outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    onClick={handlePackageApp}
+                    disabled={packaging}
+                  >
+                    <span className={`material-symbols-outlined text-sm ${packaging ? 'animate-spin' : ''}`}>{packaging ? 'sync' : 'package_2'}</span>
+                    {packaging ? 'Packaging App...' : 'Build & Package App'}
                   </button>
                 </div>
               </div>

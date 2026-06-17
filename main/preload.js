@@ -95,4 +95,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   resetDatabase:  ()          => ipcRenderer.invoke('database:reset'),
   seedDatabase:   ()          => ipcRenderer.invoke('database:seed'),
   reloadApp:      ()          => ipcRenderer.invoke('app:reload'),
+  packageApp:     ()          => ipcRenderer.invoke('developer:package-app'),
 });

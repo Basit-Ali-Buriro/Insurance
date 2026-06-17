@@ -374,4 +374,36 @@ async function handleLoginAlerts(userRole, loggedInUser) {
   }
 }
 
-module.exports = { checkLicense, renewLicense, openWhatsAppAlert, handleLoginAlerts };
+async function sendNewUserCredentialsEmail(toEmail, name, userName, plainPassword) {
+  const log = getLogger();
+  if (SMTP_CONFIG.auth.user.includes('your-sender-email') || SMTP_CONFIG.auth.pass.includes('your-gmail-app-password')) {
+    log.warn('Account Credentials email skipped: SMTP credentials not configured.');
+    return false;
+  }
+  try {
+    const transporter = nodemailer.createTransport(SMTP_CONFIG);
+    const subject = 'Welcome to Lalwani Software Solutions - Your Account Details';
+    const text = `Dear ${name},\n\n` +
+      `Your account has been created successfully in Lalwani Software Solutions.\n\n` +
+      `Here are your login credentials:\n` +
+      `Username: ${userName}\n` +
+      `Password: ${plainPassword}\n\n` +
+      `Please log in using the desktop application.\n\n` +
+      `Best regards,\n` +
+      `Lalwani Software Solutions Team`;
+
+    await transporter.sendMail({
+      from: `"Lalwani Software Solutions" <${SMTP_CONFIG.auth.user}>`,
+      to: toEmail,
+      subject: subject,
+      text: text,
+    });
+    log.info(`Account credentials email sent to ${toEmail}`);
+    return true;
+  } catch (err) {
+    log.error(`Failed to send account credentials email to ${toEmail}: ${err.message}`);
+    return false;
+  }
+}
+
+module.exports = { checkLicense, renewLicense, openWhatsAppAlert, handleLoginAlerts, sendNewUserCredentialsEmail };

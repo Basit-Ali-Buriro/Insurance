@@ -30,7 +30,12 @@ function createWindow() {
   });
 
   if (isDev) {
-    mainWindow.loadURL('http://127.0.0.1:5173');
+    mainWindow.webContents.session.clearCache().then(() => {
+      mainWindow.loadURL('http://127.0.0.1:5173');
+    }).catch(err => {
+      console.error('Failed to clear cache:', err);
+      mainWindow.loadURL('http://127.0.0.1:5173');
+    });
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
     mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
