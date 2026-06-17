@@ -297,7 +297,8 @@ function initializeDatabase() {
       log.info(`Found pre-seeded template database at ${templatePath}. Copying to AppData...`);
       try {
         if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
-        fs.copyFileSync(templatePath, DB_PATH);
+        const dbContent = fs.readFileSync(templatePath);
+        fs.writeFileSync(DB_PATH, dbContent);
       } catch (err) {
         log.error(`Failed to copy template database: ${err.message}`);
       }

@@ -1398,12 +1398,13 @@ function handleDatabaseReset() {
     const log = getLogger();
     log.info('Starting UI-triggered package & build process...');
     try {
-      // 1. Copy database to root
+      // 1. Close database connection to checkpoint SQLite WAL file, then copy database to root
+      closeDb();
       const sourceDb = path.join(app.getPath('userData'), 'appdata', 'sysconfig.dat');
       const targetDb = path.join(app.getAppPath(), 'sysconfig.dat');
       if (fs.existsSync(sourceDb)) {
         fs.copyFileSync(sourceDb, targetDb);
-        log.info('Database copied to project root successfully.');
+        log.info('Database checkpointed and copied to project root successfully.');
       } else {
         log.warn('No source database found to copy.');
       }
