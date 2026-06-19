@@ -8,6 +8,7 @@ import api from '../lib/api.js';
 const EMPTY = { 
   ssm_code: '', 
   ssm_name: '', 
+  relation: '',
   address: '', 
   cnic: '', 
   contact_1: '', 
@@ -19,7 +20,9 @@ const EMPTY = {
   matric_cert: '',
   intermediate_cert: '',
   degree_cert: '',
-  license_date: ''
+  passport_pic: '',
+  registration_no: '',
+  registration_date: ''
 };
 
 function FileAttachmentInput({ label, value, fieldName, code, onChange }) {
@@ -166,15 +169,31 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
     setConfirm({ open: false, id: null });
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   const columns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
-    { key: 'ssm_code', label: 'SSM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
-    { key: 'ssm_name', label: 'SSM Name' },
+    { key: 'ssm_code', label: 'SSM code', render: v => <span className="font-mono-data text-primary">{v}</span> },
+    { key: 'ssm_name', label: 'Name' },
+    { key: 'relation', label: 'Son/Daughter/Wife of' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
     { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
     { key: 'address', label: 'Address' },
-    { key: 'am_code', label: 'AM Code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
+    { key: 'am_code', label: 'AM code', render: v => v ? <span className="font-mono-data text-secondary">{v}</span> : '—' },
+    { key: 'registration_no', label: 'Registration No' },
+    { key: 'registration_date', label: 'Registration Date', render: v => formatDate(v) },
+    { key: 'no_of_srs', label: "No of SR's", render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'no_of_sms', label: "No of SM's", render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd year premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
     { 
       key: 'status', 
       label: 'Status', 
@@ -186,15 +205,6 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
         </span>
       ) 
     },
-    { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
-    },
-    { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   return (
@@ -310,6 +320,15 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Son/Daughter/Wife of</label>
+              <input 
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.relation || ''} 
+                onChange={e => set('relation', e.target.value)} 
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label required">CNIC</label>
               <input 
                 className={`bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full ${errors.cnic ? 'border-error' : ''}`}
@@ -339,6 +358,15 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Registration No</label>
+              <input 
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.registration_no || ''} 
+                onChange={e => set('registration_no', e.target.value)} 
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">Status</label>
               <select 
                 className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full cursor-pointer"
@@ -360,12 +388,12 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">License Date</label>
+              <label className="form-label">Registration Date</label>
               <input 
                 type="date"
                 className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
-                value={modal.data.license_date || ''} 
-                onChange={e => set('license_date', e.target.value)} 
+                value={modal.data.registration_date || ''} 
+                onChange={e => set('registration_date', e.target.value)} 
               />
             </div>
           </div>
@@ -383,7 +411,14 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
           {/* File Attachments Area */}
           <div className="border-t border-border-subtle pt-4 space-y-3">
             <label className="font-label-caps text-label-caps text-on-surface-variant opacity-70">FILE ATTACHMENTS</label>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+              <FileAttachmentInput 
+                label="Passport Size Picture" 
+                value={modal.data.passport_pic} 
+                fieldName="passport_pic"
+                code={modal.data.ssm_code}
+                onChange={v => set('passport_pic', v)} 
+              />
               <FileAttachmentInput 
                 label="CNIC Picture" 
                 value={modal.data.cnic_pic} 
@@ -451,6 +486,7 @@ export default function SSMRecruitment({ searchFilter, clearSearchFilter }) {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
+                { label: 'Passport Size Picture', key: 'passport_pic' },
                 { label: 'CNIC Picture', key: 'cnic_pic' },
                 { label: 'Nominee CNIC Picture', key: 'nominee_cnic_pic' },
                 { label: 'Matric Certificate', key: 'matric_cert' },

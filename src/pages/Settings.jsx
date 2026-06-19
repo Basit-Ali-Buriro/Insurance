@@ -372,7 +372,6 @@ export default function Settings({ user, onProfileUpdate }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[16px] text-outline">mail</span>
-                  <a href="mailto:premlalwani291@gmail.com" className="hover:text-electric-blue transition-colors">premlalwani291@gmail.com</a>
                   <a href="mailto:subhashprem4@gmail.com" className="hover:text-electric-blue transition-colors">subhashprem4@gmail.com</a>
                 </div>
               </div>

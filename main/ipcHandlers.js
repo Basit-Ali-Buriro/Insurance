@@ -9,15 +9,24 @@ const { encrypt, decrypt }   = require('./crypto');
 const { getLogger }          = require('./logger');
 const { checkLicense, renewLicense, openWhatsAppAlert, sendNewUserCredentialsEmail } = require('./licenseManager');
 
+function formatDbDate(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
 /* ─── Encrypted field maps per table ─── */
 const ENC = {
   Users:            ['name', 'username', 'contact', 'contact_email', 'contact_number'],
-  Area_Managers:    ['am_name', 'cnic', 'address', 'contact_1', 'contact_2'],
-  SSM:              ['ssm_name', 'cnic', 'address', 'contact_1', 'contact_2'],
-  SM:               ['sm_name',  'cnic', 'address', 'contact_1', 'contact_2'],
-  SR:               ['sr_name',  'cnic', 'address', 'contact_1', 'contact_2'],
+  Area_Managers:    ['am_name', 'cnic', 'address', 'contact_1', 'contact_2', 'relation', 'registration_no'],
+  SSM:              ['ssm_name', 'cnic', 'address', 'contact_1', 'contact_2', 'relation', 'registration_no'],
+  SM:               ['sm_name',  'cnic', 'address', 'contact_1', 'contact_2', 'relation', 'registration_no'],
+  SR:               ['sr_name',  'cnic', 'address', 'contact_1', 'contact_2', 'relation', 'registration_no'],
   Proposer_Register:['holder_name', 'pr_no', 'contact_1', 'contact_2'],
-  Policy_Register:  ['holder_name', 'cnic', 'address', 'contact_1', 'contact_2', 'policy_no'],
+  Policy_Register:  ['holder_name', 'cnic', 'address', 'contact_1', 'contact_2', 'policy_no', 'relation'],
 };
 
 function log() { return getLogger(); }
@@ -162,16 +171,18 @@ function handleAreaManagers() {
       no_of_srs:  db.prepare('SELECT COUNT(*) as c FROM SR  WHERE am_id=?').get(r.id)?.c ?? 0,
       total_business: db.prepare(`SELECT COALESCE(SUM(pr.premium),0) as t FROM Policy_Register pr
         JOIN SR sr ON pr.sr_id=sr.id WHERE sr.am_id=?`).get(r.id)?.t ?? 0,
-      second_year_premium: db.prepare(`SELECT COALESCE(SUM(syl.premium),0) as t FROM Second_Year_Log syl
-        JOIN SR sr ON syl.sr_id=sr.id WHERE sr.am_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(pr.premium),0) as t FROM Policy_Register pr
+        JOIN SR sr ON pr.sr_id=sr.id WHERE sr.am_id=?
+        AND pr.last_paid_date IS NOT NULL
+        AND pr.last_paid_date >= date(pr.due_date, '+1 year')`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('am:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare('INSERT INTO Area_Managers (am_code,am_name,address,cnic,contact_1,contact_2,status,license_date) VALUES (?,?,?,?,?,?,?,?)')
-        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status || 'active', data.license_date || null);
+      db.prepare('INSERT INTO Area_Managers (am_code,am_name,address,cnic,contact_1,contact_2,status,relation,registration_no,registration_date) VALUES (?,?,?,?,?,?,?,?,?,?)')
+        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status || 'active', encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null);
       log().info(`AM created: ${data.am_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -180,8 +191,8 @@ function handleAreaManagers() {
   ipcMain.handle('am:update', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare('UPDATE Area_Managers SET am_code=?,am_name=?,address=?,cnic=?,contact_1=?,contact_2=?,status=?,license_date=? WHERE id=?')
-        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status, data.license_date || null, data.id);
+      db.prepare('UPDATE Area_Managers SET am_code=?,am_name=?,address=?,cnic=?,contact_1=?,contact_2=?,status=?,relation=?,registration_no=?,registration_date=? WHERE id=?')
+        .run(data.am_code, encrypt(data.am_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.status, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -212,17 +223,19 @@ function handleSSM() {
       no_of_sms: db.prepare('SELECT COUNT(*) as c FROM SM WHERE ssm_id=?').get(r.id)?.c ?? 0,
       no_of_srs: db.prepare('SELECT COUNT(*) as c FROM SR WHERE ssm_id=?').get(r.id)?.c ?? 0,
       total_business: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE ssm_id=?`).get(r.id)?.t ?? 0,
-      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE ssm_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE ssm_id=?
+        AND last_paid_date IS NOT NULL
+        AND last_paid_date >= date(due_date, '+1 year')`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('ssm:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SSM (ssm_code,ssm_name,address,cnic,contact_1,contact_2,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SSM (ssm_code,ssm_name,address,cnic,contact_1,contact_2,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,relation,registration_no,registration_date,passport_pic)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.ssm_code, encrypt(data.ssm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null);
       log().info(`SSM created: ${data.ssm_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -232,9 +245,9 @@ function handleSSM() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SSM SET ssm_code=?,ssm_name=?,address=?,cnic=?,contact_1=?,contact_2=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,relation=?,registration_no=?,registration_date=?,passport_pic=? WHERE id=?`)
         .run(data.ssm_code, encrypt(data.ssm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -266,17 +279,19 @@ function handleSM() {
       ...decryptRow(r, fields),
       no_of_srs: db.prepare('SELECT COUNT(*) as c FROM SR WHERE sm_id=?').get(r.id)?.c ?? 0,
       total_business: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE sm_id=?`).get(r.id)?.t ?? 0,
-      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE sm_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE sm_id=?
+        AND last_paid_date IS NOT NULL
+        AND last_paid_date >= date(due_date, '+1 year')`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('sm:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SM (sm_code,sm_name,address,cnic,contact_1,contact_2,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SM (sm_code,sm_name,address,cnic,contact_1,contact_2,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,relation,registration_no,registration_date,passport_pic)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.sm_code, encrypt(data.sm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.ssm_id || null, data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null);
       log().info(`SM created: ${data.sm_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -286,9 +301,9 @@ function handleSM() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SM SET sm_code=?,sm_name=?,address=?,cnic=?,contact_1=?,contact_2=?,ssm_id=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,relation=?,registration_no=?,registration_date=?,passport_pic=? WHERE id=?`)
         .run(data.sm_code, encrypt(data.sm_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.ssm_id || null, data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -318,17 +333,19 @@ function handleSR() {
     return rows.map(r => ({
       ...decryptRow(r, fields),
       no_of_policies: db.prepare('SELECT COUNT(*) as c FROM Policy_Register WHERE sr_id=?').get(r.id)?.c ?? 0,
-      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Second_Year_Log WHERE sr_id=?`).get(r.id)?.t ?? 0,
+      second_year_premium: db.prepare(`SELECT COALESCE(SUM(premium),0) as t FROM Policy_Register WHERE sr_id=?
+        AND last_paid_date IS NOT NULL
+        AND last_paid_date >= date(due_date, '+1 year')`).get(r.id)?.t ?? 0,
     }));
   });
 
   ipcMain.handle('sr:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO SR (sr_code,sr_name,address,cnic,contact_1,contact_2,sm_id,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,license_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO SR (sr_code,sr_name,address,cnic,contact_1,contact_2,sm_id,ssm_id,am_id,status,cnic_pic,nominee_cnic_pic,matric_cert,intermediate_cert,degree_cert,relation,registration_no,registration_date,passport_pic,total_business)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(data.sr_code, encrypt(data.sr_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.sm_id || null, data.ssm_id || null, data.am_id || null, data.status || 'active',
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null, data.total_business || 0.0);
       log().info(`SR created: ${data.sr_code}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -338,9 +355,9 @@ function handleSR() {
     const db = getDb();
     try {
       db.prepare(`UPDATE SR SET sr_code=?,sr_name=?,address=?,cnic=?,contact_1=?,contact_2=?,sm_id=?,ssm_id=?,am_id=?,status=?,
-        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,license_date=? WHERE id=?`)
+        cnic_pic=?,nominee_cnic_pic=?,matric_cert=?,intermediate_cert=?,degree_cert=?,relation=?,registration_no=?,registration_date=?,passport_pic=?,total_business=? WHERE id=?`)
         .run(data.sr_code, encrypt(data.sr_name), encrypt(data.address), encrypt(data.cnic), encrypt(data.contact_1), encrypt(data.contact_2), data.sm_id || null, data.ssm_id || null, data.am_id || null, data.status,
-          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, data.license_date || null, data.id);
+          data.cnic_pic || null, data.nominee_cnic_pic || null, data.matric_cert || null, data.intermediate_cert || null, data.degree_cert || null, encrypt(data.relation || ''), encrypt(data.registration_no || ''), data.registration_date || null, data.passport_pic || null, data.total_business || 0.0, data.id);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
@@ -490,6 +507,23 @@ function handleProposer() {
   });
 }
 
+function updateSrTotalBusiness(db, srId) {
+  if (!srId) return;
+  try {
+    db.prepare(`
+      UPDATE SR
+      SET total_business = (
+        SELECT COALESCE(SUM(premium), 0)
+        FROM Policy_Register
+        WHERE sr_id = ?
+      )
+      WHERE id = ?
+    `).run(srId, srId);
+  } catch (err) {
+    getLogger().error(`Error updating SR total business for sr_id=${srId}: ${err.message}`);
+  }
+}
+
 /* ──────────────────────────── POLICY REGISTER ──────────────────────────── */
 function handlePolicy() {
   const fields = ENC.Policy_Register;
@@ -506,11 +540,12 @@ function handlePolicy() {
   ipcMain.handle('policy:create', (_e, data) => {
     const db = getDb();
     try {
-      db.prepare(`INSERT INTO Policy_Register (policy_no,holder_name,cnic,address,contact_1,contact_2,premium,issue_date,due_date,table_term,last_paid_date,sr_id,sm_id,ssm_id,proposal_id)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      db.prepare(`INSERT INTO Policy_Register (policy_no,holder_name,cnic,address,contact_1,contact_2,premium,issue_date,due_date,table_term,last_paid_date,sr_id,sm_id,ssm_id,proposal_id,relation)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
         .run(encrypt(data.policy_no), encrypt(data.holder_name), encrypt(data.cnic), encrypt(data.address), encrypt(data.contact_1), encrypt(data.contact_2),
           data.premium, data.issue_date, data.due_date, data.table_term, data.last_paid_date,
-          data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.proposal_id || null);
+          data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.proposal_id || null, encrypt(data.relation || ''));
+      if (data.sr_id) updateSrTotalBusiness(db, data.sr_id);
       log().info(`Policy created: ${data.policy_no}`);
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
@@ -520,37 +555,28 @@ function handlePolicy() {
     const db  = getDb();
     const old = db.prepare('SELECT last_paid_date, sr_id, sm_id, ssm_id, premium FROM Policy_Register WHERE id=?').get(data.id);
     try {
-      // 2nd year premium detection
-      if (old && old.last_paid_date && data.last_paid_date) {
-        const oldYear = new Date(old.last_paid_date).getFullYear();
-        const newYear = new Date(data.last_paid_date).getFullYear();
-        if (newYear > oldYear) {
-          const prem = old.premium;
-          const today = new Date().toISOString().split('T')[0];
-          if (old.sr_id)  db.prepare('UPDATE SR  SET second_year_premium=second_year_premium+? WHERE id=?').run(prem, old.sr_id);
-          if (old.sm_id)  db.prepare('UPDATE SM  SET second_year_premium=second_year_premium+? WHERE id=?').run(prem, old.sm_id);
-          if (old.ssm_id) db.prepare('UPDATE SSM SET second_year_premium=second_year_premium+? WHERE id=?').run(prem, old.ssm_id);
-          db.prepare('INSERT INTO Second_Year_Log (policy_id,sr_id,sm_id,ssm_id,premium,detected_at) VALUES (?,?,?,?,?,?)')
-            .run(data.id, old.sr_id, old.sm_id, old.ssm_id, prem, today);
-          log().info(`2nd year premium detected for policy id=${data.id}, amount=${prem}`);
-        }
-      }
-      db.prepare(`UPDATE Policy_Register SET policy_no=?,holder_name=?,cnic=?,address=?,contact_1=?,contact_2=?,premium=?,issue_date=?,due_date=?,table_term=?,last_paid_date=?,previous_paid_date=?,sr_id=?,sm_id=?,ssm_id=? WHERE id=?`)
+      db.prepare(`UPDATE Policy_Register SET policy_no=?,holder_name=?,cnic=?,address=?,contact_1=?,contact_2=?,premium=?,issue_date=?,due_date=?,table_term=?,last_paid_date=?,previous_paid_date=?,sr_id=?,sm_id=?,ssm_id=?,relation=? WHERE id=?`)
         .run(encrypt(data.policy_no), encrypt(data.holder_name), encrypt(data.cnic), encrypt(data.address), encrypt(data.contact_1), encrypt(data.contact_2),
           data.premium, data.issue_date, data.due_date, data.table_term, data.last_paid_date, old?.last_paid_date || null,
-          data.sr_id || null, data.sm_id || null, data.ssm_id || null, data.id);
+          data.sr_id || null, data.sm_id || null, data.ssm_id || null, encrypt(data.relation || ''), data.id);
+
+      if (data.sr_id) updateSrTotalBusiness(db, data.sr_id);
+      if (old && old.sr_id && old.sr_id !== data.sr_id) updateSrTotalBusiness(db, old.sr_id);
+
       return { ok: true };
     } catch (err) { return { ok: false, error: err.message }; }
   });
 
   ipcMain.handle('policy:delete', (_e, id) => {
     const db = getDb();
+    const old = db.prepare('SELECT sr_id FROM Policy_Register WHERE id=?').get(id);
     try {
       db.transaction(() => {
         db.prepare('DELETE FROM Notifications WHERE policy_id=?').run(id);
         db.prepare('DELETE FROM Second_Year_Log WHERE policy_id=?').run(id);
         db.prepare('DELETE FROM Policy_Register WHERE id=?').run(id);
       })();
+      if (old && old.sr_id) updateSrTotalBusiness(db, old.sr_id);
       log().info(`Policy deleted: id=${id}`);
       return { ok: true };
     } catch (err) {
@@ -643,7 +669,7 @@ function handleDashboard() {
     const due15 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+15 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
     const due30 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+30 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
 
-    const renewals = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE last_paid_date <= date('now','-11 months')`).get().c;
+    const renewals = due30;
 
     // Trailing 12 months chart
     const monthlyChart = [];
@@ -695,7 +721,11 @@ function handleBusinessFigure() {
     const rows = db.prepare(`SELECT sr.id, sr.sr_code, sr.sr_name, sm.sm_code,
         COALESCE(SUM(p.premium),0) as total_business,
         COUNT(p.id) as no_of_policies,
-        COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl WHERE syl.sr_id=sr.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
+        COALESCE((
+          SELECT SUM(p2.premium) FROM Policy_Register p2
+          WHERE p2.sr_id = sr.id AND p2.last_paid_date BETWEEN ? AND ?
+            AND p2.last_paid_date >= date(p2.due_date, '+1 year')
+        ),0) as second_year_premium
       FROM SR sr
       LEFT JOIN SM sm ON sr.sm_id=sm.id
       LEFT JOIN Policy_Register p ON p.sr_id=sr.id AND p.issue_date BETWEEN ? AND ?
@@ -709,7 +739,11 @@ function handleBusinessFigure() {
         COALESCE(SUM(p.premium),0) as total_business,
         COUNT(p.id) as no_of_policies,
         (SELECT COUNT(*) FROM SR sr2 WHERE sr2.sm_id=sm.id AND sr2.created_at BETWEEN ? AND ?) as no_of_srs_added,
-        COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl WHERE syl.sm_id=sm.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
+        COALESCE((
+          SELECT SUM(p2.premium) FROM Policy_Register p2
+          WHERE p2.sm_id = sm.id AND p2.last_paid_date BETWEEN ? AND ?
+            AND p2.last_paid_date >= date(p2.due_date, '+1 year')
+        ),0) as second_year_premium
       FROM SM sm
       LEFT JOIN SSM ssm ON sm.ssm_id=ssm.id
       LEFT JOIN Policy_Register p ON p.sm_id=sm.id AND p.issue_date BETWEEN ? AND ?
@@ -724,7 +758,11 @@ function handleBusinessFigure() {
         COUNT(p.id) as no_of_policies,
         (SELECT COUNT(*) FROM SR sr2 LEFT JOIN SM sm2 ON sr2.sm_id=sm2.id WHERE sm2.ssm_id=ssm.id AND sr2.created_at BETWEEN ? AND ?) as no_of_srs_added,
         (SELECT COUNT(*) FROM SM sm3 WHERE sm3.ssm_id=ssm.id AND sm3.created_at BETWEEN ? AND ?) as no_of_sms_added,
-        COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl WHERE syl.ssm_id=ssm.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
+        COALESCE((
+          SELECT SUM(p2.premium) FROM Policy_Register p2
+          WHERE p2.ssm_id = ssm.id AND p2.last_paid_date BETWEEN ? AND ?
+            AND p2.last_paid_date >= date(p2.due_date, '+1 year')
+        ),0) as second_year_premium
       FROM SSM ssm
       LEFT JOIN Area_Managers am ON ssm.am_id=am.id
       LEFT JOIN Policy_Register p ON p.ssm_id=ssm.id AND p.issue_date BETWEEN ? AND ?
@@ -740,7 +778,12 @@ function handleBusinessFigure() {
         (SELECT COUNT(*) FROM SSM ssm2 WHERE ssm2.am_id=am.id AND ssm2.created_at BETWEEN ? AND ?) as no_of_ssms_added,
         (SELECT COUNT(*) FROM SM sm2 WHERE sm2.am_id=am.id AND sm2.created_at BETWEEN ? AND ?) as no_of_sms_added,
         (SELECT COUNT(*) FROM SR sr2 WHERE sr2.am_id=am.id AND sr2.created_at BETWEEN ? AND ?) as no_of_srs_added,
-        COALESCE((SELECT SUM(syl.premium) FROM Second_Year_Log syl JOIN SR sr3 ON syl.sr_id=sr3.id WHERE sr3.am_id=am.id AND syl.detected_at BETWEEN ? AND ?),0) as second_year_premium
+        COALESCE((
+          SELECT SUM(p2.premium) FROM Policy_Register p2
+          JOIN SR sr3 ON p2.sr_id=sr3.id
+          WHERE sr3.am_id=am.id AND p2.last_paid_date BETWEEN ? AND ?
+            AND p2.last_paid_date >= date(p2.due_date, '+1 year')
+        ),0) as second_year_premium
       FROM Area_Managers am
       LEFT JOIN SR sr ON sr.am_id=am.id
       LEFT JOIN Policy_Register p ON p.sr_id=sr.id AND p.issue_date BETWEEN ? AND ?
@@ -885,8 +928,7 @@ function handlePdfGenerators() {
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    doc.fontSize(22).font('Helvetica-Bold').text('Insurance Policy Management System', { align: 'center' });
-    doc.fontSize(14).font('Helvetica-Oblique').text('Dashboard Report', { align: 'center' });
+    doc.fontSize(22).font('Helvetica-Bold').text('Dashboard Report', { align: 'center' });
     doc.moveDown();
     doc.fontSize(10).text(`Report Date: ${new Date().toLocaleString()}`, { align: 'right' });
     doc.moveDown(1.5);
@@ -1041,11 +1083,20 @@ function handlePdfGenerators() {
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
     
-    doc.fontSize(22).font('Helvetica-Bold').text('Insurance Policy Management System', { align: 'center' });
-    doc.fontSize(14).font('Helvetica-Oblique').text('Business Figure Report', { align: 'center' });
+    doc.fontSize(22).font('Helvetica-Bold').text('Business Figure Report', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(12).font('Helvetica').text(`Role: ${role}`, { align: 'left' });
-    doc.text(`Period: ${from} to ${to}`, { align: 'left' });
+    
+    let roleText = '';
+    if (role === 'SR') roleText = 'Sales Representative (SR)';
+    else if (role === 'SM') roleText = 'Sales Manager (SM)';
+    else if (role === 'SSM') roleText = 'Senior Sales Manager (SSM)';
+    else if (role === 'AM') roleText = 'Area Manager (AM)';
+    else roleText = role;
+
+    doc.fontSize(12).font('Helvetica');
+    doc.text('Role: ', { continued: true }).font('Helvetica-Bold').text(roleText);
+    doc.font('Helvetica');
+    doc.text(`Period: ${formatDbDate(from)} to ${formatDbDate(to)}`, { align: 'left' });
     doc.text(`Generated At: ${new Date().toLocaleString()}`, { align: 'left' });
     doc.moveDown(2);
     
@@ -1274,20 +1325,44 @@ function handleExcelGenerators() {
       const worksheet = workbook.addWorksheet('Policies');
 
       worksheet.columns = [
+        { header: 'Serial No', key: 'serial_no', width: 10 },
         { header: 'Policy No', key: 'policy_no', width: 18 },
-        { header: 'Holder Name', key: 'holder_name', width: 25 },
+        { header: 'Name', key: 'holder_name', width: 25 },
+        { header: 'Son/Daughter/Wife of', key: 'relation', width: 25 },
         { header: 'CNIC', key: 'cnic', width: 20 },
-        { header: 'Contact', key: 'contact_1', width: 15 },
+        { header: 'Address', key: 'address', width: 30 },
+        { header: 'Contact 1', key: 'contact_1', width: 15 },
+        { header: 'Contact 2', key: 'contact_2', width: 15 },
         { header: 'Premium (PKR)', key: 'premium', width: 18 },
         { header: 'Issue Date', key: 'issue_date', width: 15 },
         { header: 'Due Date', key: 'due_date', width: 15 },
-        { header: 'Last Paid Date', key: 'last_paid_date', width: 15 },
+        { header: 'Last Paid', key: 'last_paid_date', width: 15 },
         { header: 'SR Code', key: 'sr_code', width: 15 },
-        { header: 'SM Code', key: 'sm_code', width: 15 }
+        { header: 'SM Code', key: 'sm_code', width: 15 },
+        { header: 'SSM Code', key: 'ssm_code', width: 15 },
+        { header: 'Table Term', key: 'table_term', width: 15 }
       ];
 
+      let idx = 1;
       for (const r of data) {
-        worksheet.addRow(r);
+        worksheet.addRow({
+          serial_no: idx++,
+          policy_no: r.policy_no && r.policy_no.startsWith('TEMP-POL-') ? '' : r.policy_no,
+          holder_name: r.holder_name,
+          relation: r.relation || '',
+          cnic: r.cnic,
+          address: r.address || '',
+          contact_1: r.contact_1 || '',
+          contact_2: r.contact_2 || '',
+          premium: r.premium,
+          issue_date: formatDbDate(r.issue_date),
+          due_date: formatDbDate(r.due_date),
+          last_paid_date: formatDbDate(r.last_paid_date),
+          sr_code: r.sr_code || '',
+          sm_code: r.sm_code || '',
+          ssm_code: r.ssm_code || '',
+          table_term: r.table_term || ''
+        });
       }
 
       worksheet.getRow(1).font = { bold: true };

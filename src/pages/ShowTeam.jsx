@@ -43,6 +43,15 @@ export default function ShowTeam() {
     return name.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase());
   });
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   const srColumns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'sr_code', label: 'SR Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
@@ -66,14 +75,13 @@ export default function ShowTeam() {
       ) 
     },
     { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+      key: 'registration_date', 
+      label: 'Registration Date', 
+      render: v => formatDate(v)
     },
     { key: 'no_of_policies', label: 'Policies', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Prem', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
-
+ 
   const smColumns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'sm_code', label: 'SM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
@@ -96,15 +104,13 @@ export default function ShowTeam() {
       ) 
     },
     { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+      key: 'registration_date', 
+      label: 'Registration Date', 
+      render: v => formatDate(v)
     },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Prem', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
-
+ 
   const ssmColumns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'ssm_code', label: 'SSM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
@@ -126,16 +132,14 @@ export default function ShowTeam() {
       ) 
     },
     { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+      key: 'registration_date', 
+      label: 'Registration Date', 
+      render: v => formatDate(v)
     },
     { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
-
+ 
   const amColumns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key: 'am_code', label: 'AM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
@@ -156,15 +160,13 @@ export default function ShowTeam() {
       ) 
     },
     { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
+      key: 'registration_date', 
+      label: 'Registration Date', 
+      render: v => formatDate(v)
     },
     { key: 'no_of_ssms', label: 'SSMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   const columns = roleFilter === 'SR' ? srColumns : roleFilter === 'SM' ? smColumns : roleFilter === 'SSM' ? ssmColumns : amColumns;
@@ -250,6 +252,7 @@ export default function ShowTeam() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
+                { label: 'Passport Size Picture', key: 'passport_pic' },
                 { label: 'CNIC Picture', key: 'cnic_pic' },
                 { label: 'Nominee CNIC Picture', key: 'nominee_cnic_pic' },
                 { label: 'Matric Certificate', key: 'matric_cert' },

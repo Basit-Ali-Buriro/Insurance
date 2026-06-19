@@ -20,7 +20,7 @@ const PAGE_MAP = {
   dashboard: { component: Dashboard, label: 'Dashboard', sub: 'Overview of your insurance business performance' },
   proposer: { component: ProposerRegister, label: 'Proposer Register', sub: 'Register and manage customer proposals' },
   policy: { component: PolicyRegister, label: 'Policy Register', sub: 'Create and manage insurance policies' },
-  sr: { component: SRRegister, label: 'SR Register', sub: 'Manage Sales Representatives' },
+  sr: { component: SRRegister, label: 'SR Recruitment', sub: 'Manage Sales Representatives' },
   sm: { component: SMRecruitment, label: 'SM Recruitment', sub: 'Manage Sales Managers and hierarchies' },
   ssm: { component: SSMRecruitment, label: 'SSM Recruitment', sub: 'Manage Senior Sales Managers' },
   areamanager: { component: AreaManager, label: 'Area Manager', sub: 'Manage regional Area Managers' },

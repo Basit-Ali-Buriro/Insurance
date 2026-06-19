@@ -4,7 +4,7 @@ import Modal, { ConfirmDialog } from '../components/Modal.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const EMPTY = { am_code: '', am_name: '', address: '', cnic: '', contact_1: '', contact_2: '', status: 'active', license_date: '' };
+const EMPTY = { am_code: '', am_name: '', relation: '', address: '', cnic: '', contact_1: '', contact_2: '', registration_no: '', status: 'active', registration_date: '' };
 
 export default function AreaManager({ searchFilter, clearSearchFilter }) {
   const toast = useToast();
@@ -91,14 +91,31 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
     setErrors(e => ({ ...e, [k]: undefined })); 
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   const columns = [
     { key: 'id', label: 'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
-    { key: 'am_code', label: 'AM Code', render: v => <span className="font-mono-data text-primary">{v}</span> },
+    { key: 'am_code', label: 'AM code', render: v => <span className="font-mono-data text-primary">{v}</span> },
     { key: 'am_name', label: 'Name' },
+    { key: 'relation', label: 'Son/Daughter/Wife of' },
     { key: 'cnic', label: 'CNIC', render: v => <span className="font-mono-data">{v}</span> },
     { key: 'contact_1', label: 'Contact 1', render: v => <span className="font-mono-data">{v || '—'}</span> },
     { key: 'contact_2', label: 'Contact 2', render: v => <span className="font-mono-data">{v || '—'}</span> },
     { key: 'address', label: 'Address' },
+    { key: 'registration_no', label: 'Registration No' },
+    { key: 'registration_date', label: 'Registration Date', render: v => formatDate(v) },
+    { key: 'no_of_srs', label: "No of SR's", render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'no_of_sms', label: "No of SM's", render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'no_of_ssms', label: "No of SSM's", render: v => <span className="font-mono-data">{v}</span> },
+    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
+    { key: 'second_year_premium', label: '2nd year premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
     { 
       key: 'status', 
       label: 'Status', 
@@ -110,16 +127,6 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
         </span>
       ) 
     },
-    { 
-      key: 'license_date', 
-      label: 'License Date', 
-      render: v => v ? new Date(v).toLocaleDateString('en-GB') : '—'
-    },
-    { key: 'no_of_ssms', label: 'SSMs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'no_of_sms', label: 'SMs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'no_of_srs', label: 'SRs', render: v => <span className="font-mono-data">{v}</span> },
-    { key: 'total_business', label: 'Total Business', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
-    { key: 'second_year_premium', label: '2nd Yr Premium', render: v => <span className="font-mono-data text-primary">{`Rs. ${Number(v || 0).toLocaleString()}`}</span> },
   ];
 
   return (
@@ -203,6 +210,15 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Son/Daughter/Wife of</label>
+              <input 
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.relation || ''} 
+                onChange={e => set('relation', e.target.value)} 
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label required">CNIC</label>
               <input 
                 className={`bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full ${errors.cnic ? 'border-error' : ''}`}
@@ -232,6 +248,15 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Registration No</label>
+              <input 
+                className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
+                value={modal.data.registration_no || ''} 
+                onChange={e => set('registration_no', e.target.value)} 
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">Status</label>
               <select 
                 className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full cursor-pointer"
@@ -244,12 +269,12 @@ export default function AreaManager({ searchFilter, clearSearchFilter }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">License Date</label>
+              <label className="form-label">Registration Date</label>
               <input 
                 type="date"
                 className="bg-surface-deep border border-border-subtle text-on-surface rounded p-2 focus:ring-2 focus:ring-primary focus:outline-none w-full"
-                value={modal.data.license_date || ''} 
-                onChange={e => set('license_date', e.target.value)} 
+                value={modal.data.registration_date || ''} 
+                onChange={e => set('registration_date', e.target.value)} 
               />
             </div>
           </div>

@@ -6,7 +6,7 @@ const PAGES = [
   { key: 'dashboard',        label: 'Dashboard',         icon: 'dashboard' },
   { key: 'proposer',         label: 'Proposer Register',  icon: 'assignment' },
   { key: 'policy',           label: 'Policy Register',    icon: 'menu_book' },
-  { key: 'sr',               label: 'SR Register',        icon: 'person' },
+  { key: 'sr',               label: 'SR Recruitment',        icon: 'person' },
   { key: 'sm',               label: 'SM Recruitment',     icon: 'groups' },
   { key: 'ssm',              label: 'SSM Recruitment',    icon: 'stars' },
   { key: 'areamanager',      label: 'Area Manager',       icon: 'map' },

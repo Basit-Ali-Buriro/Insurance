@@ -5,7 +5,7 @@ import SearchableDropdown from '../components/SearchableDropdown.jsx';
 import { useToast } from '../components/Toast.jsx';
 import api from '../lib/api.js';
 
-const EMPTY = { policy_no:'', holder_name:'', cnic:'', address:'', contact_1:'', contact_2:'', premium:'', issue_date:'', due_date:'', table_term:'', last_paid_date:'', sr_id:null, sm_id:null, ssm_id:null };
+const EMPTY = { policy_no:'', holder_name:'', cnic:'', address:'', contact_1:'', contact_2:'', premium:'', issue_date:'', due_date:'', table_term:'', last_paid_date:'', sr_id:null, sm_id:null, ssm_id:null, relation:'' };
 
 export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
   const toast = useToast();
@@ -148,22 +148,32 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
     setConfirm({open:false,id:null});
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   const columns = [
     { key:'id',           label:'Serial No', render: (v, row) => <span className="font-mono-data">{filtered.indexOf(row) + 1}</span> },
     { key:'policy_no',    label:'Policy No', render: v => v && v.startsWith('TEMP-POL-') ? '' : v },
-    { key:'holder_name',  label:'Holder Name' },
+    { key:'holder_name',  label:'Name' },
+    { key:'relation',     label:'Son/Daughter/Wife of' },
     { key:'cnic',         label:'CNIC' },
     { key:'address',      label:'Address' },
     { key:'contact_1',    label:'Contact 1' },
     { key:'contact_2',    label:'Contact 2' },
     { key:'premium',      label:'Premium', render: v=>`Rs. ${Number(v||0).toLocaleString()}` },
-    { key:'issue_date',   label:'Issue Date' },
-    { key:'due_date',     label:'Due Date' },
-    { key:'table_term',    label:'Table Term' },
-    { key:'last_paid_date',label:'Last Paid' },
-    { key:'sr_code',      label:'SR Code' },
-    { key:'sm_code',      label:'SM Code' },
-    { key:'ssm_code',     label:'SSM Code' },
+    { key:'issue_date',   label:'Issue Date', render: v => formatDate(v) },
+    { key:'due_date',     label:'Due Date', render: v => formatDate(v) },
+    { key:'last_paid_date',label:'Last paid', render: v => formatDate(v) },
+    { key:'sr_code',      label:'SR code' },
+    { key:'sm_code',      label:'SM code' },
+    { key:'ssm_code',     label:'SSM code' },
+    { key:'table_term',   label:'table and term' },
   ];
 
   return (
@@ -248,6 +258,7 @@ export default function PolicyRegister({ searchFilter, clearSearchFilter }) {
           {[
             ['policy_no','Policy Number',true,'text', 'PL-XXXX-XXXX'],
             ['holder_name','Policy Holder Name',true,'text', 'Full legal name'],
+            ['relation','Son/Daughter/Wife of',false,'text', 'Guardian/Spouse Name'],
             ['cnic','CNIC / ID Number',true,'text', '00000-0000000-0'],
             ['contact_1','Contact No 1',false,'text', '+92 XXX XXXXXXX'],
             ['contact_2','Contact No 2',false,'text', '+92 XXX XXXXXXX'],

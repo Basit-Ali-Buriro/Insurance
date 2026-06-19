@@ -49,16 +49,18 @@ const SCHEMA = `
   );
 
   CREATE TABLE IF NOT EXISTS Area_Managers (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    am_code      TEXT UNIQUE NOT NULL,
-    am_name      TEXT NOT NULL,
-    address      TEXT,
-    cnic         TEXT NOT NULL,
-    contact_1    TEXT,
-    contact_2    TEXT,
-    status       TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
-    license_date DATE,
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    am_code           TEXT UNIQUE NOT NULL,
+    am_name           TEXT NOT NULL,
+    address           TEXT,
+    cnic              TEXT NOT NULL,
+    contact_1         TEXT,
+    contact_2         TEXT,
+    status            TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
+    relation          TEXT,
+    registration_no   TEXT,
+    registration_date DATE,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS SSM (
@@ -77,7 +79,10 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
-    license_date        DATE,
+    relation            TEXT,
+    registration_no     TEXT,
+    registration_date   DATE,
+    passport_pic        TEXT,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -98,7 +103,10 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
-    license_date        DATE,
+    relation            TEXT,
+    registration_no     TEXT,
+    registration_date   DATE,
+    passport_pic        TEXT,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -120,7 +128,11 @@ const SCHEMA = `
     degree_cert         TEXT,
     status              TEXT CHECK(status IN ('active','inactive')) DEFAULT 'active',
     second_year_premium REAL DEFAULT 0.0,
-    license_date        DATE,
+    relation            TEXT,
+    registration_no     TEXT,
+    registration_date   DATE,
+    passport_pic        TEXT,
+    total_business      REAL DEFAULT 0.0,
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -161,6 +173,7 @@ const SCHEMA = `
     sm_id              INTEGER REFERENCES SM(id),
     ssm_id             INTEGER REFERENCES SSM(id),
     proposal_id        INTEGER REFERENCES Proposer_Register(id),
+    relation           TEXT,
     created_at         DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -309,19 +322,66 @@ function initializeDatabase() {
 
   db.exec(SCHEMA);
 
-  // Schema alterations to support license_date for existing databases
+  // Schema alterations for Area_Managers, SSM, SM, SR
   const tables = ['Area_Managers', 'SSM', 'SM', 'SR'];
   for (const table of tables) {
+    // 1. Rename license_date to registration_date
     try {
-      db.prepare(`ALTER TABLE ${table} ADD COLUMN license_date DATE`).run();
-      log.info(`Added license_date column to ${table} table`);
+      db.prepare(`ALTER TABLE ${table} RENAME COLUMN license_date TO registration_date`).run();
+      log.info(`Renamed license_date to registration_date on ${table} table`);
     } catch (err) {
-      if (err.message.includes('duplicate column name') || err.message.includes('already exists')) {
-        // column already exists, safe to ignore
-      } else {
-        log.error(`Error migrating table ${table} for license_date: ${err.message}`);
+      // If renaming failed (e.g. license_date doesn't exist), try to add registration_date directly
+      try {
+        db.prepare(`ALTER TABLE ${table} ADD COLUMN registration_date DATE`).run();
+        log.info(`Added registration_date column to ${table} table`);
+      } catch (addErr) {
+        // Already exists or other issue, safe to ignore
       }
     }
+
+    // 2. Add relation column
+    try {
+      db.prepare(`ALTER TABLE ${table} ADD COLUMN relation TEXT`).run();
+      log.info(`Added relation column to ${table} table`);
+    } catch (err) {}
+
+    // 3. Add registration_no column
+    try {
+      db.prepare(`ALTER TABLE ${table} ADD COLUMN registration_no TEXT`).run();
+      log.info(`Added registration_no column to ${table} table`);
+    } catch (err) {}
+
+    // 4. Add passport_pic column (only SSM, SM, SR)
+    if (table !== 'Area_Managers') {
+      try {
+        db.prepare(`ALTER TABLE ${table} ADD COLUMN passport_pic TEXT`).run();
+        log.info(`Added passport_pic column to ${table} table`);
+      } catch (err) {}
+    }
+  }
+
+  // Migrations for Policy_Register relation
+  try {
+    db.prepare('ALTER TABLE Policy_Register ADD COLUMN relation TEXT').run();
+    log.info('Added relation column to Policy_Register table');
+  } catch (err) {}
+
+  // Migrations for SR total_business
+  try {
+    db.prepare('ALTER TABLE SR ADD COLUMN total_business REAL DEFAULT 0.0').run();
+    log.info('Added total_business column to SR table');
+  } catch (err) {}
+
+  // Synchronize total_business for all SRs based on Policy_Register premiums
+  try {
+    db.prepare(`
+      UPDATE SR SET total_business = (
+        SELECT COALESCE(SUM(premium), 0) FROM Policy_Register WHERE Policy_Register.sr_id = SR.id
+      )
+    `).run();
+    log.info('Synchronized total_business column for all SR records');
+  } catch (err) {
+    log.error(`Failed to synchronize total_business for SRs: ${err.message}`);
   }
 
   // Migrations for Proposer_Register contact columns

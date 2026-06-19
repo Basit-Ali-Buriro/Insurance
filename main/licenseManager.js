@@ -323,6 +323,10 @@ function openWhatsAppAlert(message) {
  */
 async function handleLoginAlerts(userRole, loggedInUser) {
   const log = getLogger();
+  if (userRole === 'developer') {
+    log.info('Developer login detected, skipping license email alerts.');
+    return;
+  }
   const config = getConfig();
   if (!config) return;
 
