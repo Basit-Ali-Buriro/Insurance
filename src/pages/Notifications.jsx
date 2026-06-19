@@ -30,12 +30,21 @@ export default function Notifications() {
     item.sr_code?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   const handleWhatsApp = async (item) => {
     await api.openWhatsapp({
       phone: item.contact_1,
       name: item.holder_name,
       policyNo: item.policy_no,
-      dueDate: item.due_date,
+      dueDate: formatDate(item.due_date),
       premium: item.premium,
     });
     await api.markWhatsapp(item.id);
@@ -147,7 +156,7 @@ export default function Notifications() {
                       </div>
                       <div>
                         <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">Due Date</span>
-                        <span className="font-mono-data text-mono-data">{item.due_date}</span>
+                        <span className="font-mono-data text-mono-data">{formatDate(item.due_date)}</span>
                       </div>
                       <div>
                         <span className="text-outline block text-[11px] uppercase tracking-wider font-semibold">SR Code</span>

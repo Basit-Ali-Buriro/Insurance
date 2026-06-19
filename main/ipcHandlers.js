@@ -665,9 +665,9 @@ function handleDashboard() {
     const prevProposals = db.prepare(`SELECT COUNT(*) as c FROM Proposer_Register WHERE pr_date >= ? AND pr_date < ?`).get(prevMonthStart, prevMonthEnd).c;
 
     const todayStr  = today.toISOString().split('T')[0];
-    const due7  = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+7 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
-    const due15 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+15 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
-    const due30 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date BETWEEN ? AND date(?,'+30 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr, todayStr).c;
+    const due7  = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date <= date(?,'+7 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr).c;
+    const due15 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date <= date(?,'+15 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr).c;
+    const due30 = db.prepare(`SELECT COUNT(*) as c FROM Policy_Register WHERE due_date <= date(?,'+30 days') AND (last_paid_date IS NULL OR last_paid_date < due_date)`).get(todayStr).c;
 
     const renewals = due30;
 
