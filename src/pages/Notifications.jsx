@@ -133,7 +133,7 @@ export default function Notifications() {
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-body-lg font-bold text-on-surface">{item.holder_name}</span>
                       {statusBadge}
-                      {item.whatsapp_sent && (
+                      {!!item.whatsapp_sent && (
                         <span className="px-2 py-0.5 rounded bg-success/10 text-success text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                           <span className="material-symbols-outlined text-[12px]">done</span>
                           Reminder Sent
@@ -168,7 +168,7 @@ export default function Notifications() {
                       </div>
                     </div>
 
-                    {item.whatsapp_sent && item.whatsapp_sent_at && (
+                    {!!item.whatsapp_sent && item.whatsapp_sent_at && (
                       <div className="text-[11px] text-outline italic">
                         Last notification sent: {new Date(item.whatsapp_sent_at).toLocaleString()}
                       </div>
